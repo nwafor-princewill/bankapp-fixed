@@ -52,6 +52,11 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+      // Debug: Log what we're sending
+    console.log('Sending login data:', { email: loginData.email, password: loginData.password });
+    console.log('API_URL:', API_URL);
+
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -63,6 +68,11 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           password: loginData.password
         }),
       });
+
+      // Debug: Log the response
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response body:', responseText);
 
       if (!response.ok) {
         throw new Error('Login failed');
@@ -83,6 +93,15 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+     // Debug: Log what we're sending
+    console.log('Sending signup data:', {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone
+    });
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
