@@ -8,7 +8,7 @@ import { FaMoneyBillWave, FaPiggyBank } from 'react-icons/fa';
 import { MdSettingsApplications } from 'react-icons/md';
 
 const menuItems = [
-  { id: 'accounts', label: 'Accounts', icon: <MdAccountBalance size={20} /> },
+  // { id: 'accounts', label: 'Accounts', icon: <MdAccountBalance size={20} /> },
   { id: 'transfers', label: 'Transfers', icon: <MdPayment size={20} /> },
   { id: 'bill-payments', label: 'Bill Payments', icon: <MdReceipt size={20} /> },
   { id: 'redeem-funds', label: 'Redeem Funds', icon: <FaMoneyBillWave size={20} /> },

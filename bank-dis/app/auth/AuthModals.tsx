@@ -71,14 +71,16 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
       // Debug: Log the response
       console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response body:', responseText);
+      // const responseText = await response.text();
+      // console.log('Response body:', responseText);
 
       if (!response.ok) {
         throw new Error('Login failed');
       }
 
       const data = await response.json();
+      console.log('Response data:', data);
+      
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
