@@ -47,6 +47,10 @@ export default function TransferPage() {
     e.preventDefault();
     setLoading(true);
 
+      // toast.error("Can't transfer now, try later");
+      // setLoading(false);
+      // return;
+
     try {
       const response = await fetch(`${API_URL}/api/transfers`, {
         method: 'POST',
