@@ -82,17 +82,7 @@ const Investment = () => {
 
 
       {/* Navigation */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            <a href="#" className="text-gray-600 hover:text-gray-800 py-4 px-1 font-medium">Personal</a>
-            <a href="#" className="text-gray-600 hover:text-gray-800 py-4 px-1 font-medium">Small Business</a>
-            <a href="#" className="text-gray-600 hover:text-gray-800 py-4 px-1 font-medium">Commercial</a>
-            <a href="#" className="text-[#03305c] border-b-2 border-[#03305c] py-4 px-1 font-medium">Institutional Investing</a>
-            <a href="#" className="text-gray-600 hover:text-gray-800 py-4 px-1 font-medium">About Us</a>
-          </nav>
-        </div>
-      </div>
+
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
