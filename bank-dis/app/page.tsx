@@ -5,6 +5,7 @@ import YourMoney from "./home/yourMoney";
 import SecureBank from "./home/secureBank";
 import BankWay from "./home/bankWay";
 import ImpactByNumbers from "./home/impactByNumbers";
+import ForexTicker from "./home/ForexTicker";
 import Performance from "./home/performance";
 import  Footer from "./home/footer";
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
      <SecureBank />
      <BankWay />
      <ImpactByNumbers />
+     <ForexTicker />
      <Performance />
      <Footer />
     </div>

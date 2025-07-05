@@ -68,3 +68,34 @@ body {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
   }
 }
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 30s linear infinite;
+  padding-right: 100%; /* Ensure items don't jump when looping */
+  white-space: nowrap;
+}
+
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth hover effects */
+.ticker-item {
+  transition: all 0.3s ease;
+}
+.ticker-item:hover {
+  background-color: rgba(232, 116, 44, 0.2) !important; /* #e8742c with opacity */
+  transform: scale(1.05);
+}
