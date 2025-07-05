@@ -30,35 +30,28 @@ const Navbar = () => {
       title: 'Small Business',
       links: [
         { name: 'Business Banking', path: '/small-business/banking' },
-        { name: 'Business Loans', path: '/small-business/loans' },
-        { name: 'Merchant Services', path: '/small-business/merchant-services' }
       ]
     },
     {
       title: 'Commercial',
       links: [
-        { name: 'Commercial Banking', path: '/commercial/banking' },
         { name: 'Treasury Management', path: '/commercial/treasury' },
-        { name: 'Commercial Lending', path: '/commercial/lending' }
-      ]
-    },
-    {
-      title: 'Institutional Investing',
-      links: [
-        { name: 'Wealth Management', path: '/institutional/wealth' },
-        { name: 'Retirement Planning', path: '/institutional/retirement' },
-        { name: 'Trust Services', path: '/institutional/trust' }
       ]
     },
     {
       title: 'About Us',
       links: [
         { name: 'Our Story', path: '/about/story' },
-        { name: 'Leadership', path: '/about/leadership' },
         { name: 'Careers', path: '/about/careers' },
-        { name: 'Community Impact', path: '/about/community' }
       ]
     }
+  ];
+
+   const topNavItems = [
+    { name: 'Contact us', path: '/contact' },
+    { name: 'Locations', path: '/locations' },
+    // { name: 'Investor Relations', path: '/investor-relations' },
+    { name: 'FAQs', path: '/faqs' }
   ];
 
   useEffect(() => {
@@ -92,10 +85,20 @@ const Navbar = () => {
             <div><Image src={logo} alt='logo' width={180} height={50} /></div>
             <div className='mx-[5rem]'>
               <ul className='flex space-x-6'>
-                {['Contact us', 'Locations', 'Investor Relations', 'FAQs'].map((item, index) => (
+                {topNavItems.map((item, index) => (
+                  <li key={index}>
+                    <Link 
+                      href={item.path}
+                      className='text-[#03305c] font-bold hover:text-[#e8742c] text-sm'
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+                {/* {['Contact us', 'Locations', 'Investor Relations', 'FAQs'].map((item, index) => (
                   <li key={index} className='text-[#03305c] font-bold hover:text-[#e8742c] text-sm 
                   '>{item}</li>
-                ))}
+                ))} */}
                 <div className='flex'>
                   <IoSearch size={24} />
                 </div>
@@ -114,11 +117,18 @@ const Navbar = () => {
               >
                 Login
               </button>
-              <button className='rounded-3xl px-4 py-1 bg-white text-[#03305c] border
+              {/* <button className='rounded-3xl px-4 py-1 bg-white text-[#03305c] border
                border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors
                 text-sm font-bold'>
                 Enroll in online banking
-              </button>
+              </button> */}
+              <Link href="/online-banking/enrollment">
+                <button className='rounded-3xl px-4 py-1 bg-white text-[#03305c] border
+                          border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors
+                            text-sm font-bold'>
+                  Enroll in online banking
+                </button>
+              </Link>
               <button
                 className='rounded-2xl px-4 py-1 bg-[#03305c] hover:bg-[#e8742c]
                text-white transition-colors text-sm font-bold'
@@ -231,7 +241,7 @@ const Navbar = () => {
             ))}
           </ul>
 
-          <div className='pt-8'>
+          {/* <div className='pt-8'>
             <ul className='space-y-5'>
               {['Contact us', 'Locations', 'Investor Relations', 'FAQs'].map((item, index) => (
                 <li key={index} className='text-[#03305c] hover:text-[#e8742c] text-lg font-bold py-1'>
@@ -239,6 +249,21 @@ const Navbar = () => {
                 </li>
               ))}
             </ul>
+          </div> */}
+
+            <div className='pt-8'>
+                <ul className='space-y-5'>
+                  {topNavItems.map((item, index) => (
+                    <li key={index}>
+                      <Link 
+                        href={item.path}
+                        className='text-[#03305c] hover:text-[#e8742c] text-lg font-bold py-1 block'
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
           </div>
 
           <IoSearch size={34} />
