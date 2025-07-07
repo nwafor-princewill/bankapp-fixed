@@ -212,61 +212,7 @@ const CreditCards = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">A</span>
-                </div>
-                <span className="text-xl font-bold">amalgamated</span>
-                <span className="text-xl font-light">bank</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                Amalgamated Bank is committed to providing exceptional banking services to our customers.
-              </p>
-              <div className="flex space-x-3">
-                <Mail className="w-5 h-5 text-gray-400" />
-                <Phone className="w-5 h-5 text-gray-400" />
-                <MapPin className="w-5 h-5 text-gray-400" />
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Personal Banking</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Checking Accounts</a></li>
-                <li><a href="#" className="hover:text-white">Savings Accounts</a></li>
-                <li><a href="#" className="hover:text-white">Credit Cards</a></li>
-                <li><a href="#" className="hover:text-white">Loans</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Business Banking</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Business Checking</a></li>
-                <li><a href="#" className="hover:text-white">Business Savings</a></li>
-                <li><a href="#" className="hover:text-white">Business Loans</a></li>
-                <li><a href="#" className="hover:text-white">Merchant Services</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white">Find Locations</a></li>
-                <li><a href="#" className="hover:text-white">FAQs</a></li>
-                <li><a href="#" className="hover:text-white">Security Center</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Amalgamated Bank. All rights reserved.</p>
-            <p className="mt-2">Credit Cards are issued by First National Bank of Omaha (FNBO®) pursuant to a license from the applicable card association.</p>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
+import Link from 'next/link';
 
 const Footer = () => {
   return (
@@ -69,7 +70,7 @@ const Footer = () => {
         </div>
 
         {/* Links Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div>
             <h4 className="font-bold mb-2 text-[#e8742c]">Startup</h4>
           </div>
@@ -93,6 +94,66 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-bold mb-2 text-[#e8742c]">Terms of Use</h4>
+          </div>
+        </div> */}
+
+                {/* Links Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Startup</h4>
+            <ul className="space-y-1">
+              <li><Link href="/startup" className="text-white hover:underline text-sm">Startup Banking</Link></li>
+              <li><Link href="/startup/benefits" className="text-white hover:underline text-sm">Benefits</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Security Center</h4>
+            <ul className="space-y-1">
+              <li><Link href="/security" className="text-white hover:underline text-sm">Security Tips</Link></li>
+              <li><Link href="/security/fraud" className="text-white hover:underline text-sm">Fraud Prevention</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Privacy Policy</h4>
+            <ul className="space-y-1">
+              <li><Link href="/privacy" className="text-white hover:underline text-sm">Privacy Overview</Link></li>
+              <li><Link href="/privacy/policy" className="text-white hover:underline text-sm">Full Policy</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Your Privacy Rights</h4>
+            <ul className="space-y-1">
+              <li><Link href="/privacy/rights" className="text-white hover:underline text-sm">Your Rights</Link></li>
+              <li><Link href="/privacy/controls" className="text-white hover:underline text-sm">Privacy Controls</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Online Privacy Policy</h4>
+            <ul className="space-y-1">
+              <li><Link href="/privacy/online" className="text-white hover:underline text-sm">Online Privacy</Link></li>
+              <li><Link href="/privacy/cookies" className="text-white hover:underline text-sm">Cookie Policy</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Consumer Account Opening Disclosure</h4>
+            <ul className="space-y-1">
+              <li><Link href="/disclosures/consumer" className="text-white hover:underline text-sm">Consumer Disclosures</Link></li>
+              <li><Link href="/disclosures/consumer/guide" className="text-white hover:underline text-sm">Account Guide</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Small Business Account Opening Disclosure</h4>
+            <ul className="space-y-1">
+              <li><Link href="/disclosures/business" className="text-white hover:underline text-sm">Business Disclosures</Link></li>
+              <li><Link href="/disclosures/business/guide" className="text-white hover:underline text-sm">Business Guide</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-2 text-[#e8742c]">Terms of Use</h4>
+            <ul className="space-y-1">
+              <li><Link href="/terms" className="text-white hover:underline text-sm">Website Terms</Link></li>
+              <li><Link href="/terms/conditions" className="text-white hover:underline text-sm">General Conditions</Link></li>
+            </ul>
           </div>
         </div>
 
