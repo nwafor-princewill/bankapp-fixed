@@ -4,13 +4,30 @@ import { useRouter } from 'next/navigation';
 import { FiUsers, FiDollarSign, FiCreditCard, FiSettings } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
+// Define User and Account types
+type Account = {
+  accountNumber: string;
+  balance: number;
+};
+
+type User = {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  accounts: Account[];
+  isAdmin: boolean;
+  // status: string;
+  status: 'active' | 'blocked';
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('users');
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -154,6 +171,39 @@ export default function AdminDashboard() {
     }
   };
 
+  // Add this function to your AdminDashboard component
+const toggleBlockUser = async (userId: string, currentlyBlocked: boolean) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/admin/block-user`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        userId,
+        block: !currentlyBlocked
+      })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      toast.success(data.message);
+      // Update the local users state
+      setUsers(users.map(user => 
+        user._id === userId 
+          ? { ...user, status: currentlyBlocked ? 'active' : 'blocked' } 
+          : user
+      ));
+    } else {
+      throw new Error(data.message || 'Failed to update user status');
+    }
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Operation failed');
+  }
+};
+
   const handleBtcUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -272,6 +322,7 @@ export default function AdminDashboard() {
         <div className="bg-white p-4 rounded shadow">
           <h2 className="text-xl font-semibold mb-4">All Users</h2>
           <div className="overflow-x-auto">
+  
             <table className="min-w-full">
               <thead>
                 <tr className="border-b">
@@ -279,19 +330,20 @@ export default function AdminDashboard() {
                   <th className="text-left p-2">Email</th>
                   <th className="text-left p-2">Account Numbers</th>
                   <th className="text-left p-2">Total Balance</th>
-                  <th className="text-left p-2">Status</th>
                   <th className="text-left p-2">Admin</th>
+                  <th className="text-left p-2">Status</th>
+                  <th className="text-left p-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user: any) => (
+                {users.map((user: User) => (
                   <tr key={user._id} className="border-b hover:bg-gray-50">
                     <td className="p-2">{user.firstName} {user.lastName}</td>
                     <td className="p-2">{user.email}</td>
                     <td className="p-2">
                       {user.accounts?.length > 0 ? (
                         <div className="space-y-1">
-                          {user.accounts.map((acc: any, idx: number) => (
+                          {user.accounts.map((acc, idx) => (
                             <div key={idx} className="text-sm">
                               {acc.accountNumber}
                             </div>
@@ -304,7 +356,7 @@ export default function AdminDashboard() {
                     <td className="p-2">
                       {user.accounts?.length > 0 ? (
                         <div className="space-y-1">
-                          {user.accounts.map((acc: any, idx: number) => (
+                          {user.accounts.map((acc, idx) => (
                             <div key={idx} className="text-sm font-medium">
                               ${acc.balance?.toLocaleString() || '0'}
                             </div>
@@ -315,11 +367,6 @@ export default function AdminDashboard() {
                       )}
                     </td>
                     <td className="p-2">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                        Active
-                      </span>
-                    </td>
-                    <td className="p-2">
                       <span className={`px-2 py-1 rounded text-xs ${
                         user.isAdmin 
                           ? 'bg-red-100 text-red-800' 
@@ -327,6 +374,27 @@ export default function AdminDashboard() {
                       }`}>
                         {user.isAdmin ? 'Admin' : 'User'}
                       </span>
+                    </td>
+                    <td className="p-2">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        user.status === 'active' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.status || 'active'}
+                      </span>
+                    </td>
+                    <td className="p-2">
+                      <button
+                        onClick={() => toggleBlockUser(user._id, user.status === 'blocked')}
+                        className={`px-3 py-1 rounded text-white text-sm ${
+                          user.status === 'active' 
+                            ? 'bg-red-500 hover:bg-red-600' 
+                            : 'bg-green-500 hover:bg-green-600'
+                        }`}
+                      >
+                        {user.status === 'active' ? 'Block' : 'Unblock'}
+                      </button>
                     </td>
                   </tr>
                 ))}

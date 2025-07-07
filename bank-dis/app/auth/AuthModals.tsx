@@ -118,9 +118,17 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
       const data = await response.json();
       
+      // if (!response.ok) {
+      //   throw new Error(data.message || 'Login failed');
+      // }
+
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+      if (response.status === 403) {
+        // Handle blocked user case
+        throw new Error('Your account has been blocked. Please contact support.');
       }
+      throw new Error(data.message || 'Login failed');
+    }
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
