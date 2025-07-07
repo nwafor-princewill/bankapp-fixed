@@ -29,7 +29,6 @@ const ForexTicker = () => {
           if (baseCurrency === "USD") {
             rate = data.conversion_rates[targetCurrency];
           } else {
-            // Convert non-USD pairs (e.g. EUR/USD = 1/USD/EUR)
             rate = 1 / data.conversion_rates[baseCurrency];
           }
 
@@ -44,7 +43,7 @@ const ForexTicker = () => {
 
     const simulateData = () => {
       setForexData(prev => prev.map(item => {
-        const change = (Math.random() * 0.2 - 0.1); // Small random changes
+        const change = (Math.random() * 0.2 - 0.1);
         return {
           ...item,
           price: item.price * (1 + change/100),
@@ -54,7 +53,7 @@ const ForexTicker = () => {
     };
 
     fetchForexData();
-    const interval = setInterval(fetchForexData, 60000); // Update every 1 minute
+    const interval = setInterval(fetchForexData, 60000);
     
     return () => clearInterval(interval);
   }, []);
@@ -62,26 +61,48 @@ const ForexTicker = () => {
   return (
     <div className="bg-[#03305c] py-3 border-t-2 border-[#e8742c] overflow-hidden">
       <div className="max-w-full mx-auto">
-        <div className="flex overflow-x-hidden">
-          {/* Duplicate content for seamless looping */}
-          {[...forexData, ...forexData].map((item, index) => (
-            <div 
-              key={`${item.pair}-${index}`}
-              className="flex items-center px-6 py-2 shrink-0 animate-marquee"
-            >
-              <span className="font-bold text-white min-w-[90px]">
-                {item.pair}
-              </span>
-              <span className="text-white mx-3 min-w-[80px] text-right">
-                {item.price.toFixed(4)}
-              </span>
-              <span className={`min-w-[80px] text-right ${
-                item.change >= 0 ? 'text-green-400' : 'text-[#e8742c]'
-              }`}>
-                {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change).toFixed(2)}%
-              </span>
-            </div>
-          ))}
+        <div className="flex overflow-x-hidden whitespace-nowrap">
+          <div className="inline-flex animate-marquee">
+            {forexData.map((item, index) => (
+              <div 
+                key={`${item.pair}-${index}`}
+                className="flex items-center px-6 py-2 ticker-item"
+              >
+                <span className="font-bold text-white min-w-[90px]">
+                  {item.pair}
+                </span>
+                <span className="text-white mx-3 min-w-[80px] text-right">
+                  {item.price.toFixed(4)}
+                </span>
+                <span className={`min-w-[80px] text-right ${
+                  item.change >= 0 ? 'text-green-400' : 'text-[#e8742c]'
+                }`}>
+                  {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change).toFixed(2)}%
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* Duplicate for seamless looping */}
+          <div className="inline-flex animate-marquee" aria-hidden="true">
+            {forexData.map((item, index) => (
+              <div 
+                key={`${item.pair}-dup-${index}`}
+                className="flex items-center px-6 py-2 ticker-item"
+              >
+                <span className="font-bold text-white min-w-[90px]">
+                  {item.pair}
+                </span>
+                <span className="text-white mx-3 min-w-[80px] text-right">
+                  {item.price.toFixed(4)}
+                </span>
+                <span className={`min-w-[80px] text-right ${
+                  item.change >= 0 ? 'text-green-400' : 'text-[#e8742c]'
+                }`}>
+                  {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change).toFixed(2)}%
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

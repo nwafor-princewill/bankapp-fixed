@@ -72,30 +72,30 @@ body {
 /* Marquee Animation */
 @keyframes marquee {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(-100%); }
 }
 
 .animate-marquee {
   display: inline-block;
   animation: marquee 30s linear infinite;
-  padding-right: 100%; /* Ensure items don't jump when looping */
   white-space: nowrap;
+  padding-right: 1rem; /* Small gap between loops */
 }
 
-/* Hide scrollbar but allow scrolling */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Smooth hover effects */
+/* Ticker item styles */
 .ticker-item {
   transition: all 0.3s ease;
+  display: inline-flex;
+  flex-shrink: 0;
 }
+
 .ticker-item:hover {
-  background-color: rgba(232, 116, 44, 0.2) !important; /* #e8742c with opacity */
+  background-color: rgba(232, 116, 44, 0.2);
   transform: scale(1.05);
+}
+
+/* Container styles */
+.ticker-container {
+  display: inline-flex;
+  width: max-content;
 }

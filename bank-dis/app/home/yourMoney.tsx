@@ -40,9 +40,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           rounded-3xl font-medium transition-colors text-sm'>
             {primaryButtonText}
           </button>
-          <div className='text-[#03305c] font-medium flex items-center gap-1 cursor-pointer hover:underline'>
+          {/* <div className='text-[#03305c] font-medium flex items-center gap-1 cursor-pointer hover:underline'>
             Learn More <FaLongArrowAltRight className="ml-1" />
-          </div>
+          </div> */}
         </div>
 
         <hr className='border-[#03305c] opacity-30 my-4' />
