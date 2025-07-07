@@ -149,7 +149,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
           </div>
 
           {/* Additional summary details */}
-          <div className="grid grid-cols-3 gap-2 text-sm">
+          {/* <div className="grid grid-cols-3 gap-2 text-sm">
             <div className="bg-gray-50 p-2 rounded">
               <p className="text-gray-500">Deposits</p>
               <p className="font-medium text-green-600">
@@ -166,6 +166,29 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
               <p className="text-gray-500">Last Activity</p>
               <p className="font-medium">
                 {new Date(summary.lastTransactionDate).toLocaleDateString()}
+              </p>
+            </div>
+          </div> */}
+          {/* Update the monthlyStats display part in AccountSummary.tsx */}
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-gray-500">Deposits</p>
+              <p className="font-medium text-green-600">
+                +{summary.currency} {summary.monthlyStats.totalDeposits.toFixed(2)}
+              </p>
+            </div>
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-gray-500">Withdrawals</p>
+              <p className="font-medium text-red-600">
+                -{summary.currency} {summary.monthlyStats.totalWithdrawals.toFixed(2)}
+              </p>
+            </div>
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-gray-500">Last Activity</p>
+              <p className="font-medium">
+                {summary.lastTransactionDate ? 
+                  new Date(summary.lastTransactionDate).toLocaleDateString() : 
+                  'No activity yet'}
               </p>
             </div>
           </div>

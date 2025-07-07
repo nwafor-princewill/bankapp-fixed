@@ -24,7 +24,7 @@ export default function BillPaymentPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [billers, setBillers] = useState<Biller[]>([]);
   const [formData, setFormData] = useState({
-    fromAccount: '',
+    bankName: 'Global Trust Bank', // Changed from fromAccount to bankName
     billerId: '',
     amount: '',
     paymentDate: new Date().toISOString().split('T')[0],
@@ -35,19 +35,23 @@ export default function BillPaymentPage() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        // Fetch accounts
+        
+        // Fetch billers - now using hardcoded billers instead of API call
+        const hardcodedBillers: Biller[] = [
+          { id: '1', name: 'Electricity Company', category: 'Utilities', accountNumber: 'ELEC-12345' },
+          { id: '2', name: 'Water Corporation', category: 'Utilities', accountNumber: 'WATER-67890' },
+          { id: '3', name: 'Internet Provider', category: 'Telecom', accountNumber: 'NET-54321' },
+          { id: '4', name: 'Cable TV', category: 'Entertainment', accountNumber: 'TV-98765' },
+          { id: '5', name: 'Mobile Carrier', category: 'Telecom', accountNumber: 'MOBILE-13579' }
+        ];
+        setBillers(hardcodedBillers);
+
+        // Keeping accounts fetch in case you need it elsewhere
         const accountsRes = await fetch(`${API_URL}/api/accounts`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const accountsData = await accountsRes.json();
         if (accountsRes.ok) setAccounts(accountsData.accounts);
-
-        // Fetch billers
-        const billersRes = await fetch(`${API_URL}/api/billers`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const billersData = await billersRes.json();
-        if (billersRes.ok) setBillers(billersData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -60,6 +64,11 @@ export default function BillPaymentPage() {
     setLoading(true);
 
     try {
+      // Show error message instead of processing payment
+      throw new Error('Cannot pay bills now. Try again later.');
+      
+      // The original API call is commented out since we're showing error
+      /*
       const response = await fetch(`${API_URL}/api/bill-payments`, {
         method: 'POST',
         headers: {
@@ -74,6 +83,7 @@ export default function BillPaymentPage() {
 
       toast.success(`Bill payment of $${formData.amount} processed!`);
       router.push('/dashboard');
+      */
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Payment failed');
     } finally {
@@ -87,21 +97,16 @@ export default function BillPaymentPage() {
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">From Account</label>
-          <select
-            name="fromAccount"
-            value={formData.fromAccount}
-            onChange={(e) => setFormData({...formData, fromAccount: e.target.value})}
+          <label className="block text-sm font-medium mb-1">Bank Name</label>
+          <input
+            type="text"
+            name="bankName"
+            value={formData.bankName}
+            onChange={(e) => setFormData({...formData, bankName: e.target.value})}
             className="w-full p-2 border rounded"
             required
-          >
-            <option value="">Select Account</option>
-            {accounts.map((account) => (
-              <option key={account.accountNumber} value={account.accountNumber}>
-                {account.type} ••••{account.accountNumber.slice(-4)} (${account.balance.toFixed(2)})
-              </option>
-            ))}
-          </select>
+            readOnly // Making it read-only since it's fixed to "Global Trust Bank"
+          />
         </div>
 
         <div>

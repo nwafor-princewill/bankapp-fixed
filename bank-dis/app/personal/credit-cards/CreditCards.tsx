@@ -60,7 +60,7 @@ const CreditCards = () => {
           <div className="lg:col-span-2">
             {/* Hero Section */}
             <div className="mb-8">
-              <div className="text-sm text-gray-600 mb-2">Personal Banking</div>
+                <div className="text-sm mb-2" style={{ color: "#03305c" }}>Personal Banking</div>
                 <h1 className="text-3xl font-bold mb-4" style={{ color: "#03305c" }}>Credit Cards</h1>
               <p className="text-xl text-gray-600 mb-8">Choose the right card for you</p>
             </div>
