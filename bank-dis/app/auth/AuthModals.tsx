@@ -12,6 +12,18 @@ interface AuthModalsProps {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+// Supported currencies
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'] as const;
+
+// Security questions
+const SECURITY_QUESTIONS = [
+  "What was your first pet's name?",
+  "What city were you born in?",
+  "What is your mother's maiden name?",
+  "What was the name of your first school?",
+  "What was your childhood nickname?"
+];
+
 const AuthModals: React.FC<AuthModalsProps> = ({ 
   showLogin, 
   showSignup, 
@@ -26,6 +38,17 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
+    gender: 'prefer-not-to-say',
+    dateOfBirth: '',
+    country: '',
+    state: '',
+    address: '',
+    currency: 'USD',
+    securityQuestions: [
+      { question: '', answer: '' },
+      { question: '', answer: '' }
+    ]
   });
   const [loginData, setLoginData] = useState({
     email: '',
@@ -71,7 +94,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     return { isValid: true };
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -80,6 +103,23 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     
     // Clear error when user starts typing
     if (error) setError('');
+  };
+
+  const handleSecurityQuestionChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const fieldName = name.replace(`securityQuestions[${index}].`, '');
+    
+    setFormData(prev => {
+      const newQuestions = [...prev.securityQuestions];
+      newQuestions[index] = {
+        ...newQuestions[index],
+        [fieldName]: value
+      };
+      return {
+        ...prev,
+        securityQuestions: newQuestions
+      };
+    });
   };
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,17 +158,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
       const data = await response.json();
       
-      // if (!response.ok) {
-      //   throw new Error(data.message || 'Login failed');
-      // }
-
       if (!response.ok) {
-      if (response.status === 403) {
-        // Handle blocked user case
-        throw new Error('Your account has been blocked. Please contact support.');
+        if (response.status === 403) {
+          throw new Error('Your account has been blocked. Please contact support.');
+        }
+        throw new Error(data.message || 'Login failed');
       }
-      throw new Error(data.message || 'Login failed');
-    }
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -144,6 +179,16 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Add this validation
+    const incompleteQuestions = formData.securityQuestions.some(
+      q => !q.question.trim() || !q.answer.trim()
+    );
+    
+    if (incompleteQuestions) {
+      setError('Please complete all security questions');
+      return;
+    }
     
     // Validate email format
     const emailValidation = validateEmailWithSuggestions(formData.email);
@@ -172,6 +217,40 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       setError('Password must be at least 6 characters long');
       return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (!formData.dateOfBirth) {
+      setError('Date of birth is required');
+      return;
+    }
+
+    if (!formData.country) {
+      setError('Country is required');
+      return;
+    }
+
+    if (!formData.state) {
+      setError('State/Province is required');
+      return;
+    }
+
+    if (!formData.address) {
+      setError('Address is required');
+      return;
+    }
+
+    // Validate security questions
+    for (let i = 0; i < formData.securityQuestions.length; i++) {
+      const question = formData.securityQuestions[i];
+      if (!question.question || !question.answer) {
+        setError('Please complete all security questions');
+        return;
+      }
+    }
     
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -184,7 +263,15 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           lastName: formData.lastName.trim(),
           email: formData.email.trim().toLowerCase(),
           password: formData.password,
-          phone: formData.phone.trim()
+          confirmPassword: formData.confirmPassword, // <<< THIS IS THE MISSING LINE
+          phone: formData.phone.trim(),
+          gender: formData.gender,
+          dateOfBirth: formData.dateOfBirth,
+          country: formData.country,
+          state: formData.state,
+          address: formData.address,
+          securityQuestions: formData.securityQuestions,
+          currency: formData.currency
         }),
       });
 
@@ -360,6 +447,135 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 required
               />
             </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                  Gender
+                </label>
+                <select
+                  id="gender"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  required
+                >
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  required
+                  max={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Country"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                  State/Province
+                </label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="State/Province"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                Address
+              </label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                placeholder="Full address"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+                Preferred Currency
+              </label>
+              <select
+                id="currency"
+                name="currency"
+                value={formData.currency}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                required
+              >
+                {CURRENCIES.map(currency => (
+                  <option key={currency} value={currency}>{currency}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Security Questions
+              </label>
+              {formData.securityQuestions.map((question, index) => (
+                <div key={index} className="mb-4">
+                  <select
+                    name={`securityQuestions[${index}].question`}
+                    value={question.question}
+                    onChange={handleSecurityQuestionChange(index)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent mb-2"
+                    required
+                  >
+                    <option value="">Select a security question</option>
+                    {SECURITY_QUESTIONS.map((q, i) => (
+                      <option key={i} value={q}>{q}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    name={`securityQuestions[${index}].answer`}
+                    value={question.answer}
+                    onChange={handleSecurityQuestionChange(index)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="Your answer"
+                    required
+                  />
+                </div>
+              ))}
+            </div>
             <div>
               <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
                 Create Password
@@ -372,6 +588,22 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
                 placeholder="Create a password (min. 6 characters)"
+                required
+                minLength={6}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirm-password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                placeholder="Confirm your password"
                 required
                 minLength={6}
               />

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import AccountSummary from './AccountSummary';
 import QuickActions from './QuickActions';
-// import RecentTransactions from './RecentTransactions';
 import AccountCard from './AccountCard';
 import CryptoTransactions from './crypto/CryptoTransactions';
 import CryptoSummary from './crypto/CryptoSummary';
@@ -49,7 +48,6 @@ const DashboardPage = () => {
 
         if (!response.ok) throw new Error('Failed to fetch user data');
         
-        // **FIXED LINE:** The API returns { user: {...} }, so we need to extract the 'user' object.
         const data = await response.json();
         setAccountData(data.user); 
 
@@ -64,17 +62,16 @@ const DashboardPage = () => {
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#03305c]"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#03305c] dark:border-blue-400"></div>
     </div>
   );
 
   if (error) return (
     <div className="flex justify-center items-center h-screen">
-      <div className="text-red-500">{error}</div>
+      <div className="text-red-500 dark:text-red-400">{error}</div>
     </div>
   );
 
-  // Default fallback data
   const defaultAccount = {
     accountNumber: '0000000000',
     accountName: 'TEST ACCOUNT',
@@ -86,19 +83,20 @@ const DashboardPage = () => {
     openingDate: new Date().toISOString().split('T')[0]
   };
 
-  // This line will now work correctly because accountData is the user object.
   const primaryAccount = (accountData?.accounts && accountData.accounts.length > 0) 
     ? accountData.accounts[0] 
     : defaultAccount;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[#03305c]">
+      <h1 className="text-2xl font-bold text-[#03305c] dark:text-gray-100">
         Welcome back, {accountData?.firstName} {accountData?.lastName}!
       </h1>
 
+      {/* Mobile: Single column, Desktop: 3-column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
+        
+        {/* Mobile Order #1, Desktop: Left Column */}
         <div className="lg:col-span-1 space-y-6">
           <AccountCard 
             accountNumber={primaryAccount.accountNumber}
@@ -110,22 +108,64 @@ const DashboardPage = () => {
             routingNumber={primaryAccount.routingNumber}
             openingDate={primaryAccount.openingDate}
           />
-          <CryptoSummary />
-          <SendBTC />
+          {/* Desktop: CryptoSummary and SendBTC in left column */}
+          <div className="hidden lg:block">
+            <CryptoSummary />
+          </div>
+          <div className="hidden lg:block">
+            <SendBTC />
+          </div>
         </div>
-        
-        {/* Right Column */}
+
+        {/* Desktop: Right Column (2 columns wide) */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Desktop: Top row with AccountSummary and QuickActions */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-6">
             <AccountSummary accountNumber={primaryAccount.accountNumber} />
             <QuickActions accountNumber={primaryAccount.accountNumber} />
-              <TransactionHistory accountNumber={primaryAccount.accountNumber} />
-            
           </div>
           
-          <CryptoTransactions />
-          {/* <RecentTransactions accountNumber={primaryAccount.accountNumber} /> */}
+          {/* Desktop: TransactionHistory spanning full width */}
+          <div className="hidden lg:block">
+            <TransactionHistory accountNumber={primaryAccount.accountNumber} />
+          </div>
+          
+          {/* Desktop: CryptoTransactions */}
+          <div className="hidden lg:block">
+            <CryptoTransactions />
+          </div>
         </div>
+
+        {/* Mobile Order #2: QuickActions (shown only on mobile) */}
+        <div className="lg:hidden">
+          <QuickActions accountNumber={primaryAccount.accountNumber} />
+        </div>
+        
+        {/* Mobile Order #3: AccountSummary (shown only on mobile) */}
+        <div className="lg:hidden">
+          <AccountSummary accountNumber={primaryAccount.accountNumber} />
+        </div>
+
+        {/* Mobile Order #4: TransactionHistory (shown only on mobile) */}
+        <div className="lg:hidden">
+          <TransactionHistory accountNumber={primaryAccount.accountNumber} />
+        </div>
+
+        {/* Mobile Order #5: CryptoSummary (shown only on mobile) */}
+        <div className="lg:hidden">
+          <CryptoSummary />
+        </div>
+
+        {/* Mobile Order #6: SendBTC (shown only on mobile) */}
+        <div className="lg:hidden">
+          <SendBTC />
+        </div>
+
+        {/* Mobile Order #7: CryptoTransactions (shown only on mobile) */}
+        <div className="lg:hidden">
+          <CryptoTransactions />
+        </div>
+
       </div>
     </div>
   );
