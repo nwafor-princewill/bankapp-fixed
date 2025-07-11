@@ -6,7 +6,7 @@ interface ProductCardProps {
   tag: string;
   title: string;
   description: string;
-  primaryButtonText: string;
+  // primaryButtonText: string;
   highlightValue: string;
   highlightDescription?: string;
   features: string[];
@@ -18,7 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   tag, 
   title, 
   description, 
-  primaryButtonText, 
+  // primaryButtonText, 
   highlightValue, 
   highlightDescription, 
   features,
@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className='flex justify-between gap-4 mb-6'>
           <button className='bg-[#e8742c] hover:bg-[#d16624] text-white py-2 px-6 
           rounded-3xl font-medium transition-colors text-sm'>
-            {primaryButtonText}
+            {/* {primaryButtonText} */}
           </button>
           {/* <div className='text-[#03305c] font-medium flex items-center gap-1 cursor-pointer hover:underline'>
             Learn More <FaLongArrowAltRight className="ml-1" />
@@ -71,7 +71,7 @@ interface Product {
   tag: string;
   title: string;
   description: string;
-  primaryButtonText: string;
+  // primaryButtonText: string;
   highlightValue: string;
   highlightDescription?: string;
   features: string[];
@@ -84,7 +84,7 @@ const YourMoney: React.FC = () => {
       tag: "Personal",
       title: "7-Month Certificate of Deposit",
       description: "Accelerate your growth and gain peace of mind with an investment you can count on. Once your CD is opened, your interest rate within your chosen term is guaranteed.1,2",
-      primaryButtonText: "Apply now",
+      // primaryButtonText: "Apply now",
       highlightValue: "4.03% APY*",
       features: [
         '$500 deposit to open account',
@@ -96,7 +96,7 @@ const YourMoney: React.FC = () => {
       tag: "Personal",
       title: "Online Checking",
       description: "A powerful, interest-bearing checking account1 that can be opened online in minutes, giving you the convenience and flexibility you need every day.",
-      primaryButtonText: "Apply now",
+      // primaryButtonText: "Apply now",
       highlightValue: "$0",
       highlightDescription: "Monthly maintenance fee",
       features: [
@@ -110,7 +110,7 @@ const YourMoney: React.FC = () => {
       tag: "Small Business",
       title: "Amalgamated Business Checking Plus",
       description: "A flexible account for growing businesses and organizations with transaction volume and cash management needs.",
-      primaryButtonText: "Email Us",
+      // primaryButtonText: "Email Us",
       highlightValue: "$0",
       highlightDescription: "Minimum opening deposit",
       features: [
@@ -123,7 +123,7 @@ const YourMoney: React.FC = () => {
       tag: "Commercial",
       title: "Hard Working Money Market Account",
       description: "Earn more on your commercial savings with a tiered interest rate that rewards higher balances.",
-      primaryButtonText: "Email Us",
+      // primaryButtonText: "Email Us",
       highlightValue: "$1,000",
       highlightDescription: "Minimum initial deposit",
       features: [
