@@ -109,9 +109,9 @@ const DashboardPage = () => {
             openingDate={primaryAccount.openingDate}
           />
           {/* Desktop: CryptoSummary and SendBTC in left column */}
-          <div className="hidden lg:block">
+          {/* <div className="hidden lg:block">
             <CryptoSummary />
-          </div>
+          </div> */}
           <div className="hidden lg:block">
             <SendBTC />
           </div>
@@ -152,9 +152,9 @@ const DashboardPage = () => {
         </div>
 
         {/* Mobile Order #5: CryptoSummary (shown only on mobile) */}
-        <div className="lg:hidden">
+        {/* <div className="lg:hidden">
           <CryptoSummary />
-        </div>
+        </div> */}
 
         {/* Mobile Order #6: SendBTC (shown only on mobile) */}
         <div className="lg:hidden">

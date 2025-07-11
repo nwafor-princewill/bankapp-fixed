@@ -104,7 +104,7 @@ const YourMoney: React.FC = () => {
         'Earns interest',
         'Includes check writing'
       ],
-      secondaryActionText: "See Rates"
+      // secondaryActionText: "See Rates"
     },
     {
       tag: "Small Business",
