@@ -35,7 +35,7 @@ const ContactPage = () => {
               <FaPhone className="text-3xl text-[#e8742c] mr-4" />
               <h2 className="text-2xl font-bold text-[#03305c]">Have questions? Call us</h2>
             </div>
-            <p className="text-3xl font-bold text-[#03305c] mb-6">800-662-0860</p>
+            <p className="text-3xl font-bold text-[#03305c] mb-6">+1-780-476-1737</p>
             <div className="flex items-center text-[#03305c]">
               <FaMapMarkerAlt className="text-[#e8742c] mr-2" />
               <span>Prefer in person? <span className="font-semibold">Find a location</span></span>
@@ -49,15 +49,15 @@ const ContactPage = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: <FaPhone className="text-2xl" />, title: "Personal Banking", number: "800-662-0860", hours: "Mon. - Fri. 8 AM - 8 PM & Sat. 9 AM - 2 PM ET" },
-              { icon: <FaCreditCard className="text-2xl" />, title: "Lost or Stolen Card", number: "800-500-1044", hours: "24 hours / 7 days a week" },
-              { icon: <FaLock className="text-2xl" />, title: "Online Banking Support", number: "800-662-0860 (option 2)", hours: "24 hours / 7 days a week" },
-              { icon: <FaShieldAlt className="text-2xl" />, title: "Fraud Help Line", number: "800-662-0860", hours: "24 hours / 7 days a week" },
-              { icon: <FaMobileAlt className="text-2xl" />, title: "Consumer Credit Card", number: "888-295-5540", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
-              { icon: <FaMobileAlt className="text-2xl" />, title: "Business Credit Card", number: "800-819-4249", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
-              { icon: <FaLandmark className="text-2xl" />, title: "Political Banking", number: "202-721-0770", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
-              { icon: <FaLandmark className="text-2xl" />, title: "Commercial Banking", number: "866-542-8788", hours: "Mon. - Fri. 8 AM - 5 PM ET" },
-              { icon: <FaChartLine className="text-2xl" />, title: "Investment Management", number: "888-404-8058", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaPhone className="text-2xl" />, title: "Personal Banking", number: "+1-780-476-1737", hours: "Mon. - Fri. 8 AM - 8 PM & Sat. 9 AM - 2 PM ET" },
+              { icon: <FaCreditCard className="text-2xl" />, title: "Lost or Stolen Card", number: "+1-780-476-1737", hours: "24 hours / 7 days a week" },
+              { icon: <FaLock className="text-2xl" />, title: "Online Banking Support", number: "+1-780-476-1737 (option 2)", hours: "24 hours / 7 days a week" },
+              { icon: <FaShieldAlt className="text-2xl" />, title: "Fraud Help Line", number: "+1-780-476-1737", hours: "24 hours / 7 days a week" },
+              { icon: <FaMobileAlt className="text-2xl" />, title: "Consumer Credit Card", number: "+1-780-476-1737", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaMobileAlt className="text-2xl" />, title: "Business Credit Card", number: "+1-780-476-1737", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaLandmark className="text-2xl" />, title: "Political Banking", number: "+1-780-476-1737", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaLandmark className="text-2xl" />, title: "Commercial Banking", number: "+1-780-476-1737", hours: "Mon. - Fri. 8 AM - 5 PM ET" },
+              { icon: <FaChartLine className="text-2xl" />, title: "Investment Management", number: "+1-780-476-1737", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
             ].map((service, index) => (
               <div key={index} className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
                 <div className="flex items-center mb-4">
@@ -78,7 +78,7 @@ const ContactPage = () => {
           <h2 className="text-3xl font-bold text-[#03305c] mb-6">Other Ways to Connect</h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { title: "Mail", detail: "Amalgamated Bank\nPO Box 1234\nNew York, NY 10001" },
+              { title: "Mail", detail: "amalgamateedbank@gmail.com\nNew York, NY 10001" },
               { title: "Secure Message", detail: "Log in to online banking to send a secure message" },
               { title: "Social Media", detail: "Connect with us on Twitter, Facebook, and LinkedIn" },
             ].map((item, index) => (

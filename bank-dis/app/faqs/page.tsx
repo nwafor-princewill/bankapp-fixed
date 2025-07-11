@@ -115,7 +115,7 @@ const FAQPage = () => {
             <p>Our Customer Service team is available to help with fraud and security concerns.</p>
           </div>
           <div className="bg-[#e8742c] text-white px-6 py-3 rounded-lg font-bold">
-            800-662-0860
+            +1-780-476-1737
           </div>
         </div>
 

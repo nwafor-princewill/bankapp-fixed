@@ -23,7 +23,7 @@ const OnlineBankingEnrollment = () => {
               <FaPhone className="text-2xl text-[#e8742c] mr-3" />
               <h3 className="text-lg font-bold text-[#03305c]">Contact Center</h3>
             </div>
-            <p className="text-2xl font-bold text-[#03305c] mb-2">800-662-0860</p>
+            <p className="text-2xl font-bold text-[#03305c] mb-2">+1-780-476-1737</p>
           </div>
           
           <div className="bg-[#f8f9fa] p-6 rounded-lg border border-gray-200">

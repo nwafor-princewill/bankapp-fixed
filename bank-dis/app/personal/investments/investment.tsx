@@ -331,14 +331,14 @@ const Investment = () => {
                   <Phone className="w-5 h-5 text-[#e8742c]" />
                   <div>
                     <p className="font-medium text-gray-800">Call us</p>
-                    <p className="text-sm text-gray-600">1-800-INVEST-1</p>
+                    <p className="text-sm text-gray-600">+1-780-476-1737</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-[#e8742c]" />
                   <div>
                     <p className="font-medium text-gray-800">Email us</p>
-                    <p className="text-sm text-gray-600">investments@amalgamatedbank.com</p>
+                    <p className="text-sm text-gray-600">amalgamateedbank@gmail.com</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">

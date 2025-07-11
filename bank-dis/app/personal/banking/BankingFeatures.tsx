@@ -143,12 +143,12 @@ const BankingFeatures = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
               <div>
                 <h4 className="font-bold text-[#e8742c] mb-2">Phone Support</h4>
-                <p className="text-[#03305c] font-semibold">800-555-0860</p>
+                <p className="text-[#03305c] font-semibold">+1-780-476-1737</p>
                 <p className="text-gray-600 text-sm">Available 24/7 for your convenience</p>
               </div>
               <div>
                 <h4 className="font-bold text-[#e8742c] mb-2">Email Support</h4>
-                <p className="text-[#03305c] font-semibold">support@bank.com</p>
+                <p className="text-[#03305c] font-semibold">@amalgamateedbank@gmail.com</p>
                 <p className="text-gray-600 text-sm">Get responses within 24 hours</p>
               </div>
               <div>

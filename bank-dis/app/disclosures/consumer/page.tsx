@@ -149,7 +149,7 @@ export default function ConsumerPage() {
             find the right solutions for your financial needs.
           </p>
           <div className="mt-4 space-y-2">
-            <p><strong>Phone:</strong> (800) 555-1234</p>
+            <p><strong>Phone:</strong> +1-780-476-1737</p>
             <p><strong>Email:</strong> amalgamateedbank@gmail.com</p>
             <p><strong>Branch Locator:</strong> Visit our website to find a location near you</p>
             <p><strong>Hours:</strong> Monday-Friday 8:00 AM - 6:00 PM EST</p>
