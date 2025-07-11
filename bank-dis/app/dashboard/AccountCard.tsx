@@ -1,4 +1,6 @@
 import React from 'react';
+// import CurrencyDisplay from './CurrencyDisplay';
+import CurrencyDisplay from '@/app/components/CurrencyDisplay';
 
 interface AccountCardProps {
   accountNumber: string;
@@ -8,7 +10,7 @@ interface AccountCardProps {
   currency: string;
   iban?: string;
   routingNumber?: string;
-    openingDate?: string; // Add this line
+  openingDate?: string;
 }
 
 const AccountCard: React.FC<AccountCardProps> = ({
@@ -19,7 +21,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
   currency,
   iban,
   routingNumber,
-  openingDate // Add this to destructuring
+  openingDate
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg border border-[#03305c]">
@@ -64,9 +66,11 @@ const AccountCard: React.FC<AccountCardProps> = ({
         
         <div>
           <p className="text-sm text-gray-500">Current Balance</p>
-          <p className="text-2xl font-bold">
-            {currency} {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </p>
+          <CurrencyDisplay 
+            amount={balance}
+            currency={currency}
+            className="text-2xl font-bold"
+          />
         </div>
       </div>
     </div>

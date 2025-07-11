@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+// import CurrencyDisplay from './CurrencyDisplay';
+import CurrencyDisplay from '@/app/components/CurrencyDisplay';
 
 interface AccountSummaryData {
   currentBalance: number;
@@ -41,7 +43,6 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
           }
         );
 
-        // Check for HTML response (like 404 pages)
         const contentType = response.headers.get('content-type');
         if (!contentType?.includes('application/json')) {
           const text = await response.text();
@@ -60,7 +61,6 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
         console.error('Fetch error:', error);
         setError(error instanceof Error ? error.message : 'Unknown error');
         
-        // Fallback data
         setSummary({
           currentBalance: 1000,
           availableBalance: 1000,
@@ -95,7 +95,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
     );
   }
 
-    if (error) {
+  if (error) {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Account Summary</h2>
@@ -124,17 +124,20 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
                 <p className="text-sm text-gray-500">{accountNumber}</p>
               </div>
               <div className="text-right">
-                <p className="font-semibold">
-                  {summary.currency} {summary.availableBalance.toLocaleString(undefined, { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })}
-                </p>
+                <CurrencyDisplay 
+                  amount={summary.availableBalance}
+                  currency={summary.currency}
+                  className="font-semibold"
+                />
                 <p className={`text-sm ${
                   summary.monthlyStats.netChange >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {summary.monthlyStats.netChange >= 0 ? '+' : ''}
-                  {summary.monthlyStats.netChange.toFixed(2)} this month
+                  <CurrencyDisplay 
+                    amount={summary.monthlyStats.netChange}
+                    currency={summary.currency}
+                    showPlusSign
+                    className="inline"
+                  /> this month
                 </p>
               </div>
             </div>
@@ -148,19 +151,24 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
             </div>
           </div>
 
-          {/* Update the monthlyStats display part in AccountSummary.tsx */}
           <div className="grid grid-cols-3 gap-2 text-sm">
             <div className="bg-gray-50 p-2 rounded">
               <p className="text-gray-500">Deposits</p>
-              <p className="font-medium text-green-600">
-                +{summary.currency} {summary.monthlyStats.totalDeposits.toFixed(2)}
-              </p>
+              <CurrencyDisplay 
+                amount={summary.monthlyStats.totalDeposits}
+                currency={summary.currency}
+                className="font-medium text-green-600"
+                showPlusSign
+              />
             </div>
             <div className="bg-gray-50 p-2 rounded">
               <p className="text-gray-500">Withdrawals</p>
-              <p className="font-medium text-red-600">
-                -{summary.currency} {summary.monthlyStats.totalWithdrawals.toFixed(2)}
-              </p>
+              <CurrencyDisplay 
+                amount={summary.monthlyStats.totalWithdrawals}
+                currency={summary.currency}
+                className="font-medium text-red-600"
+                showMinusSign
+              />
             </div>
             <div className="bg-gray-50 p-2 rounded">
               <p className="text-gray-500">Last Activity</p>
