@@ -2,7 +2,6 @@ import React from 'react';
 import DashboardNav from './DashboardNav';
 import DashboardSidebar from './DashboardSidebar';
 
-
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }

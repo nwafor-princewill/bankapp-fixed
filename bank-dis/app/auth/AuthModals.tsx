@@ -1,7 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { ImCancelCircle } from 'react-icons/im';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 interface AuthModalsProps {
   showLogin: boolean;
@@ -55,6 +57,15 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     password: ''
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetToken, setResetToken] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   // Set the active tab based on which modal is shown
   useEffect(() => {
@@ -64,6 +75,17 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       setActiveTab('login');
     }
   }, [showLogin, showSignup]);
+
+  // Check for reset token in URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (token) {
+      setResetToken(token);
+      setShowResetPassword(true);
+      setActiveTab('login');
+    }
+  }, []);
 
   // Email validation function
   const validateEmail = (email: string): boolean => {
@@ -263,7 +285,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           lastName: formData.lastName.trim(),
           email: formData.email.trim().toLowerCase(),
           password: formData.password,
-          confirmPassword: formData.confirmPassword, // <<< THIS IS THE MISSING LINE
+          confirmPassword: formData.confirmPassword,
           phone: formData.phone.trim(),
           gender: formData.gender,
           dateOfBirth: formData.dateOfBirth,
@@ -292,6 +314,67 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     }
   };
 
+  const handleForgotPassword = async () => {
+    try {
+      setError('');
+      const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: forgotPasswordEmail }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to send reset email');
+      }
+
+      setResetSuccess(true);
+      setTimeout(() => {
+        setShowForgotPassword(false);
+        setResetSuccess(false);
+      }, 3000);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process request');
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setError('');
+      const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token: resetToken,
+          newPassword
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reset password');
+      }
+
+      setResetSuccess(true);
+      setTimeout(() => {
+        setShowResetPassword(false);
+        setResetSuccess(false);
+        setActiveTab('login');
+      }, 3000);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reset password');
+    }
+  };
+
   if (!showLogin && !showSignup) return null;
 
   return (
@@ -314,32 +397,34 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           </div>
         )}
 
-        <div className="flex border-b mb-6">
-          <button
-            type="button"
-            className={`py-2 px-4 font-medium transition-colors ${
-              activeTab === 'login' 
-                ? 'text-[#03305c] border-b-2 border-[#03305c]' 
-                : 'text-gray-500 hover:text-[#03305c]'
-            }`}
-            onClick={() => setActiveTab('login')}
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            className={`py-2 px-4 font-medium transition-colors ${
-              activeTab === 'signup' 
-                ? 'text-[#03305c] border-b-2 border-[#03305c]' 
-                : 'text-gray-500 hover:text-[#03305c]'
-            }`}
-            onClick={() => setActiveTab('signup')}
-          >
-            Open an Account
-          </button>
-        </div>
+        {!showForgotPassword && !showResetPassword && (
+          <div className="flex border-b mb-6">
+            <button
+              type="button"
+              className={`py-2 px-4 font-medium transition-colors ${
+                activeTab === 'login' 
+                  ? 'text-[#03305c] border-b-2 border-[#03305c]' 
+                  : 'text-gray-500 hover:text-[#03305c]'
+              }`}
+              onClick={() => setActiveTab('login')}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              className={`py-2 px-4 font-medium transition-colors ${
+                activeTab === 'signup' 
+                  ? 'text-[#03305c] border-b-2 border-[#03305c]' 
+                  : 'text-gray-500 hover:text-[#03305c]'
+              }`}
+              onClick={() => setActiveTab('signup')}
+            >
+              Open an Account
+            </button>
+          </div>
+        )}
 
-        {activeTab === 'login' ? (
+        {activeTab === 'login' && !showForgotPassword && !showResetPassword ? (
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -356,12 +441,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 required
               />
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
               <input
-                type="password"
+                type={showLoginPassword ? "text" : "password"}
                 id="login-password"
                 name="password"
                 value={loginData.password}
@@ -370,11 +455,22 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 placeholder="Enter your password"
                 required
               />
+              <button
+                type="button"
+                className="absolute right-3 top-8 text-gray-500"
+                onClick={() => setShowLoginPassword(!showLoginPassword)}
+              >
+                {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
             <div className="flex justify-between items-center">
-              <a href="#" className="text-sm text-[#03305c] hover:underline">
+              <button 
+                type="button" 
+                className="text-sm text-[#03305c] hover:underline"
+                onClick={() => setShowForgotPassword(true)}
+              >
                 Forgot Password?
-              </a>
+              </button>
             </div>
             <button
               type="submit"
@@ -383,7 +479,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({
               Continue
             </button>
           </form>
-        ) : (
+        ) : null}
+
+        {activeTab === 'signup' && !showForgotPassword && !showResetPassword ? (
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -576,12 +674,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 </div>
               ))}
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
                 Create Password
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="signup-password"
                 name="password"
                 value={formData.password}
@@ -591,13 +689,20 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 required
                 minLength={6}
               />
+              <button
+                type="button"
+                className="absolute right-3 top-8 text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password
               </label>
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 id="confirm-password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
@@ -607,6 +712,13 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 required
                 minLength={6}
               />
+              <button
+                type="button"
+                className="absolute right-3 top-8 text-gray-500"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
             <button
               type="submit"
@@ -614,6 +726,97 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             >
               Open Account
             </button>
+          </form>
+        ) : null}
+
+        {showForgotPassword && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Reset Password</h3>
+            {resetSuccess ? (
+              <div className="p-3 bg-green-100 text-green-700 rounded-md">
+                If an account exists with this email, you will receive a reset link
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600">
+                  Enter your email to receive a password reset link
+                </p>
+                <div>
+                  <label htmlFor="forgot-email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="forgot-email"
+                    value={forgotPasswordEmail}
+                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="flex-1 bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors"
+                  >
+                    Send Reset Link
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {showResetPassword && (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <h3 className="text-lg font-medium">Set New Password</h3>
+            {resetSuccess ? (
+              <div className="p-3 bg-green-100 text-green-700 rounded-md">
+                Password updated successfully! You can now login with your new password
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="Enter new password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(false)}
+                    className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors"
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </>
+            )}
           </form>
         )}
       </div>
