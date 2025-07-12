@@ -2,26 +2,27 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiSettings, FiHelpCircle, FiShield, FiExternalLink, FiMenu, FiX } from 'react-icons/fi';
+import { FiSettings, FiHelpCircle, FiShield, FiExternalLink, FiMenu, FiX, FiHome } from 'react-icons/fi';
 import { MdAccountBalance, MdPayment, MdReceipt, MdPeople, MdBuild, MdCreditCard } from 'react-icons/md';
 import { FaMoneyBillWave, FaPiggyBank } from 'react-icons/fa';
 import { MdSettingsApplications } from 'react-icons/md';
 
 const menuItems = [
-  // { id: 'accounts', label: 'Accounts', icon: <MdAccountBalance size={20} /> },
-  { id: 'transfers', label: 'Transfers', icon: <MdPayment size={20} /> },
-  { id: 'bill-payments', label: 'Bill Payments', icon: <MdReceipt size={20} /> },
-  { id: 'redeem-funds', label: 'Redeem Funds', icon: <FaMoneyBillWave size={20} /> },
-  { id: 'beneficiaries', label: 'Beneficiary Management', icon: <MdPeople size={20} /> },
-  { id: 'loans', label: 'Loans and Investments', icon: <FaPiggyBank size={20} /> },
-  { id: 'service-requests', label: 'Service Requests', icon: <MdBuild size={20} /> },
-  { id: 'card-management', label: 'Card Management', icon: <MdCreditCard size={20} /> },
+  // The path for the main dashboard is now correct.
+  { id: 'dashboard', label: 'Dashboard', icon: <FiHome size={20} />, path: '/dashboard' },
+  // I've updated the paths below to match your complex href logic for consistency.
+  { id: 'transfers', label: 'Transfers', icon: <MdPayment size={20} />, path: '/dashboard/transactions/transfer' },
+  { id: 'bill-payments', label: 'Bill Payments', icon: <MdReceipt size={20} />, path: '/dashboard/transactions/bills' },
+  { id: 'redeem-funds', label: 'Redeem Funds', icon: <FaMoneyBillWave size={20} />, path: '/dashboard/transactions/redeem' },
+  { id: 'card-management', label: 'Card Management', icon: <MdCreditCard size={20} />, path: '/dashboard/transactions/card' },
+  { id: 'beneficiaries', label: 'Beneficiary Management', icon: <MdPeople size={20} />, path: '/dashboard/beneficiaries' },
+  { id: 'loans', label: 'Loans and Investments', icon: <FaPiggyBank size={20} />, path: '/dashboard/loans' },
+  { id: 'service-requests', label: 'Service Requests', icon: <MdBuild size={20} />, path: '/dashboard/service-requests' },
 ];
 
 const settingsItems = [
-  { id: 'settings/login-security', label: 'Login & Security', icon: <FiShield size={18} /> },
-  { id: 'settings/notifications', label: 'Notifications & Alerts', icon: <FiSettings size={18} /> },
-  // { id: 'money-movement', label: 'Money Movement Settings', icon: <FiSettings size={18} /> },
+  { id: 'settings/login-security', label: 'Login & Security', icon: <FiShield size={18} />, path: '/dashboard/settings/login-security' },
+  { id: 'settings/notifications', label: 'Notifications & Alerts', icon: <FiSettings size={18} />, path: '/dashboard/settings/notifications' },
 ];
 
 const DashboardSidebar = () => {
@@ -48,14 +49,9 @@ const DashboardSidebar = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Function to determine if a link is active
-  const isActive = (path: string) => {
-    return pathname.includes(path);
-  };
-
   return (
     <>
-      {/* Mobile Menu Button - Repositioned */}
+      {/* Mobile Menu Button */}
       <button
         onClick={toggleMobileMenu}
         className="lg:hidden fixed top-20 right-4 z-50 bg-[#03305c] text-white p-3 rounded-full shadow-lg hover:bg-[#1e4770] transition-colors duration-200"
@@ -85,29 +81,31 @@ const DashboardSidebar = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* Main Menu - Updated with proper links */}
+          {/* Main Menu */}
           <nav className="p-4">
             <ul className="space-y-1">
-              {menuItems.map(item => (
-                <li key={item.id}>
-                  <Link
-                    href={
-                      item.id === 'transfers' ? '/dashboard/transactions/transfer' :
-                      item.id === 'bill-payments' ? '/dashboard/transactions/bills' :
-                      item.id === 'card-management' ? '/dashboard/transactions/card' :
-                      item.id === 'redeem-funds' ? '/dashboard/transactions/redeem' :
-                      `/dashboard/${item.id}`
-                    }
-                    className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
-                      isActive(item.id) ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
-                    }`}
-                    onClick={closeMobileMenu}
-                  >
-                    <span className="mr-3">{item.icon}</span>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {menuItems.map(item => {
+                // **THE FIX for highlighting:** This logic now correctly identifies the active page.
+                const isActive = item.id === 'dashboard'
+                  ? pathname === item.path
+                  : pathname.startsWith(item.path);
+
+                return (
+                  <li key={item.id}>
+                    <Link
+                      // **THE FIX for the URL:** We now use the 'path' property from the menuItems array directly.
+                      href={item.path}
+                      className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
+                        isActive ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
+                      }`}
+                      onClick={closeMobileMenu}
+                    >
+                      <span className="mr-3">{item.icon}</span>
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -147,18 +145,23 @@ const DashboardSidebar = () => {
             </button>
             {expandedSections.settings && (
               <ul className="mt-2 space-y-1">
-                {settingsItems.map(item => (
-                  <li key={item.id}>
-                    <Link
-                      href={`/dashboard/${item.id}`}
-                      className="flex items-center px-3 py-2 rounded-md hover:bg-[#1e4770] transition-colors duration-200"
-                      onClick={closeMobileMenu}
-                    >
-                      <span className="mr-3">{item.icon}</span>
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
+                {settingsItems.map(item => {
+                  const isActive = pathname.startsWith(item.path);
+                  return (
+                    <li key={item.id}>
+                      <Link
+                        href={item.path}
+                        className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
+                          isActive ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
+                        }`}
+                        onClick={closeMobileMenu}
+                      >
+                        <span className="mr-3">{item.icon}</span>
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
@@ -198,9 +201,6 @@ const DashboardSidebar = () => {
             )}
           </div>
         </div>
-
-        {/* External Links */}
- 
       </div>
     </>
   );
