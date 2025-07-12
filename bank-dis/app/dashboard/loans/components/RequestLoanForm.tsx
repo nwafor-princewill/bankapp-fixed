@@ -50,10 +50,10 @@ export default function RequestLoanForm() {
           {/* Amount Field */}
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-600">
-              Loan Amount ($)
+              Loan Amount 
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></span>
               <input
                 type="number"
                 value={formData.amount}

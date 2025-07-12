@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 
 const ForexTicker = () => {
-  const [forexData, setForexData] = useState([
+  // Hardcoded fallback values (using your initial prices)
+  const HARDCODED_DATA = [
     { pair: "EUR/USD", price: 1.08, change: 0 },
     { pair: "GBP/USD", price: 1.26, change: 0 },
     { pair: "USD/JPY", price: 151.50, change: 0 },
@@ -11,7 +12,10 @@ const ForexTicker = () => {
     { pair: "USD/CHF", price: 0.91, change: 0 },
     { pair: "NZD/USD", price: 0.60, change: 0 },
     { pair: "USD/CNY", price: 7.24, change: 0 }
-  ]);
+  ];
+
+  const [forexData, setForexData] = useState(HARDCODED_DATA);
+  const [usingLiveData, setUsingLiveData] = useState(false);
 
   useEffect(() => {
     const fetchForexData = async () => {
@@ -19,41 +23,48 @@ const ForexTicker = () => {
         const res = await fetch(
           `https://v6.exchangerate-api.com/v6/c967c06350a885894fc6a855/latest/USD`
         );
+        
+        // Check if API limit is reached
+        if (res.status === 429) {
+          console.log("API limit reached - using hardcoded values");
+          setUsingLiveData(false);
+          return;
+        }
+
         const data = await res.json();
         
+        // Critical validation to prevent "EUR undefined" error
+        if (!data?.conversion_rates) {
+          throw new Error("Invalid API response");
+        }
+
         setForexData(prev => prev.map(item => {
-          const baseCurrency = item.pair.split('/')[0];
-          const targetCurrency = item.pair.split('/')[1];
+          const [baseCurrency, targetCurrency] = item.pair.split('/');
           let rate;
           
           if (baseCurrency === "USD") {
-            rate = data.conversion_rates[targetCurrency];
+            rate = data.conversion_rates[targetCurrency] || item.price;
           } else {
-            rate = 1 / data.conversion_rates[baseCurrency];
+            const baseRate = data.conversion_rates[baseCurrency];
+            rate = baseRate ? 1 / baseRate : item.price;
           }
 
           const change = ((rate - item.price) / item.price) * 100;
           return { ...item, price: rate, change };
         }));
+
+        setUsingLiveData(true);
       } catch (error) {
-        console.log("Using simulated data");
-        simulateData();
+        console.log("Using hardcoded data due to error:", error);
+        setUsingLiveData(false);
       }
     };
 
-    const simulateData = () => {
-      setForexData(prev => prev.map(item => {
-        const change = (Math.random() * 0.2 - 0.1);
-        return {
-          ...item,
-          price: item.price * (1 + change/100),
-          change
-        };
-      }));
-    };
-
+    // Try fetching live data first
     fetchForexData();
-    const interval = setInterval(fetchForexData, 60000);
+    
+    // Check daily if API limit has reset (instead of every minute)
+    const interval = setInterval(fetchForexData, 24 * 60 * 60 * 1000); // 24 hours
     
     return () => clearInterval(interval);
   }, []);
@@ -61,48 +72,30 @@ const ForexTicker = () => {
   return (
     <div className="bg-[#03305c] py-3 border-t-2 border-[#e8742c] overflow-hidden">
       <div className="max-w-full mx-auto">
-        <div className="flex overflow-x-hidden whitespace-nowrap">
-          <div className="inline-flex animate-marquee">
-            {forexData.map((item, index) => (
-              <div 
-                key={`${item.pair}-${index}`}
-                className="flex items-center px-6 py-2 ticker-item"
-              >
-                <span className="font-bold text-white min-w-[90px]">
-                  {item.pair}
-                </span>
-                <span className="text-white mx-3 min-w-[80px] text-right">
-                  {item.price.toFixed(4)}
-                </span>
-                <span className={`min-w-[80px] text-right ${
-                  item.change >= 0 ? 'text-green-400' : 'text-[#e8742c]'
-                }`}>
-                  {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change).toFixed(2)}%
-                </span>
-              </div>
-            ))}
+        {!usingLiveData && (
+          <div className="text-center text-yellow-400 text-xs pb-1">
+            {/* Showing static rates (API limit reached - updates automatically when available) */}
           </div>
-          {/* Duplicate for seamless looping */}
-          <div className="inline-flex animate-marquee" aria-hidden="true">
-            {forexData.map((item, index) => (
-              <div 
-                key={`${item.pair}-dup-${index}`}
-                className="flex items-center px-6 py-2 ticker-item"
-              >
-                <span className="font-bold text-white min-w-[90px]">
-                  {item.pair}
-                </span>
-                <span className="text-white mx-3 min-w-[80px] text-right">
-                  {item.price.toFixed(4)}
-                </span>
-                <span className={`min-w-[80px] text-right ${
-                  item.change >= 0 ? 'text-green-400' : 'text-[#e8742c]'
-                }`}>
-                  {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change).toFixed(2)}%
-                </span>
-              </div>
-            ))}
-          </div>
+        )}
+        <div className="flex overflow-x-hidden">
+          {[...forexData, ...forexData].map((item, index) => (
+            <div 
+              key={`${item.pair}-${index}`}
+              className="flex items-center px-6 py-2 shrink-0 animate-marquee"
+            >
+              <span className="font-bold text-white min-w-[90px]">
+                {item.pair}
+              </span>
+              <span className="text-white mx-3 min-w-[80px] text-right">
+                {item.price.toFixed(4)}
+              </span>
+              <span className={`min-w-[80px] text-right ${
+                item.change >= 0 ? 'text-green-400' : 'text-[#e8742c]'
+              }`}>
+                {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change).toFixed(2)}%
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

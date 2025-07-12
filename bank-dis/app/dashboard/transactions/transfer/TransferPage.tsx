@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import CurrencyDisplay from '@/app/components/CurrencyDisplay';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -9,6 +10,7 @@ export default function TransferPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
+  const [currency, setCurrency] = useState<string>('USD');
   const [formData, setFormData] = useState({
     bankName: '',
     toAccount: '',
@@ -50,11 +52,14 @@ export default function TransferPage() {
         const data = await response.json();
         // Handle both response formats
         const balance = data.balance ?? data.data?.availableBalance ?? 0;
+        const currency = data.currency ?? data.data?.currency ?? 'USD';
         setCurrentBalance(balance);
+        setCurrency(currency);
       } catch (error) {
         console.error('Error fetching balance:', error);
         toast.error('Failed to load account balance. Showing 0.00 as default.');
         setCurrentBalance(0);
+        setCurrency('USD');
       }
     };
 
@@ -124,7 +129,11 @@ export default function TransferPage() {
       
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
         <p className="text-sm text-gray-600">Available Balance</p>
-        <p className="text-2xl font-bold">${currentBalance.toFixed(2)}</p>
+        <CurrencyDisplay 
+          amount={currentBalance}
+          currency={currency}
+          className="text-2xl font-bold"
+        />
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -155,7 +164,7 @@ export default function TransferPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Amount (USD)</label>
+          <label className="block text-sm font-medium mb-1">Amount ({currency})</label>
           <input
             type="number"
             name="amount"

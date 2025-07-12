@@ -28,7 +28,7 @@ const BankWay = () => {
               Live Customer Service
             </h2>
             <p className="text-gray-600">
-              Call <span className="font-medium">800-662-0860</span> to talk to one of our real, human experts, who can help answer all your financial questions.
+              Call <span className="font-medium">+1-780-476-1737</span> to talk to one of our real, human experts, who can help answer all your financial questions.
             </p>
           </div>
           

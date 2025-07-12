@@ -24,7 +24,7 @@ export default function BillPaymentPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [billers, setBillers] = useState<Biller[]>([]);
   const [formData, setFormData] = useState({
-    bankName: 'Global Trust Bank', // Changed from fromAccount to bankName
+    bankName: 'Amalgamateed Bank', // Changed from fromAccount to bankName
     billerId: '',
     amount: '',
     paymentDate: new Date().toISOString().split('T')[0],
@@ -128,7 +128,7 @@ export default function BillPaymentPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Amount (USD)</label>
+          <label className="block text-sm font-medium mb-1">Amount </label>
           <input
             type="number"
             name="amount"

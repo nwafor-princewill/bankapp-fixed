@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-// import CurrencyDisplay from './CurrencyDisplay';
 import CurrencyDisplay from '@/app/components/CurrencyDisplay';
 
 interface AccountSummaryData {
@@ -135,7 +134,8 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
                   <CurrencyDisplay 
                     amount={summary.monthlyStats.netChange}
                     currency={summary.currency}
-                    showPlusSign
+                    showPlusSign={summary.monthlyStats.netChange >= 0}
+                    showMinusSign={summary.monthlyStats.netChange < 0}
                     className="inline"
                   /> this month
                 </p>

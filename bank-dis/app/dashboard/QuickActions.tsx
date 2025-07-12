@@ -35,12 +35,12 @@ const QuickActions: React.FC<QuickActionsProps> = ({ accountNumber }) => {
       color: 'bg-yellow-100 text-yellow-600',
       onClick: () => router.push('/dashboard/transactions/card')
     },
-    { 
-      icon: <MdReceipt size={20} />, 
-      label: 'Statements',
-      color: 'bg-red-100 text-red-600',
-      onClick: () => router.push('/dashboard/statements')
-    },
+    // { 
+    //   icon: <MdReceipt size={20} />, 
+    //   label: 'Statements',
+    //   color: 'bg-red-100 text-red-600',
+    //   onClick: () => router.push('/dashboard/statements')
+    // },
   ];
 
   return (
