@@ -73,7 +73,7 @@ const ResetPasswordForm: React.FC = () => {
       
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/login'); // Adjust this path to your login page
+        router.replace('/'); // Adjust this path to your login page
       }, 3000);
 
     } catch (err) {
@@ -92,7 +92,7 @@ const ResetPasswordForm: React.FC = () => {
               Password Reset Successful
             </h2>
             <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md">
-              Your password has been successfully reset. You will be redirected to the login page in a few seconds.
+              Your password has been successfully reset. You will be redirected to the homepage in a few seconds.
             </div>
           </div>
         </div>

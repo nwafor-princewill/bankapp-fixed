@@ -343,45 +343,38 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setError('');
-      const response = await fetch(`${API_URL}/api/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          token: resetToken,
-          newPassword
-        }),
-      });
+  e.preventDefault();
+  try {
+    setError('');
+    const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        token: resetToken,
+        newPassword
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-        if (data.success) {
-        // Close ALL modals and reload the page
-        onClose();
-        window.location.href = '/'; // Full refresh shows AuthModal again
-      }
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to reset password');
-      }
-
-      setResetSuccess(true);
-      setTimeout(() => {
-        onClose();
-        window.location.href = '/'
-        // setShowResetPassword(false);
-        // setResetSuccess(false);
-        // setActiveTab('login');
-      }, 2000);
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reset password');
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to reset password');
     }
-  };
+
+    setResetSuccess(true);
+    setTimeout(() => {
+      setShowResetPassword(false);
+      setResetSuccess(false);
+      onClose();
+      router.replace('/'); // Use router.replace to clear query parameters
+    }, 2000);
+    
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to reset password');
+  }
+};
 
   if (!showLogin && !showSignup) return null;
 
