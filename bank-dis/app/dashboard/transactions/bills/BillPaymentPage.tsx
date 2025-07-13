@@ -1,81 +1,58 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-interface Biller {
-  id: string;
-  name: string;
-  category: string;
-  accountNumber: string;
-}
-
-interface Account {
-  accountNumber: string;
-  balance: number;
-  type: string;
-}
-
 export default function BillPaymentPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [billers, setBillers] = useState<Biller[]>([]);
   const [formData, setFormData] = useState({
-    bankName: 'Amalgamateed Bank', // Changed from fromAccount to bankName
+    bankName: 'Amalgamated Bank',
     billerId: '',
     amount: '',
     paymentDate: new Date().toISOString().split('T')[0],
     reference: `BILL-${Date.now()}`
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        
-        // Fetch billers - now using hardcoded billers instead of API call
-        const hardcodedBillers: Biller[] = [
-          { id: '1', name: 'Electricity Company', category: 'Utilities', accountNumber: 'ELEC-12345' },
-          { id: '2', name: 'Water Corporation', category: 'Utilities', accountNumber: 'WATER-67890' },
-          { id: '3', name: 'Internet Provider', category: 'Telecom', accountNumber: 'NET-54321' },
-          { id: '4', name: 'Cable TV', category: 'Entertainment', accountNumber: 'TV-98765' },
-          { id: '5', name: 'Mobile Carrier', category: 'Telecom', accountNumber: 'MOBILE-13579' }
-        ];
-        setBillers(hardcodedBillers);
-
-        // Keeping accounts fetch in case you need it elsewhere
-        const accountsRes = await fetch(`${API_URL}/api/accounts`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const accountsData = await accountsRes.json();
-        if (accountsRes.ok) setAccounts(accountsData.accounts);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
-  }, []);
+  // Hardcoded billers from your original code
+  const billers = [
+    { id: '1', name: 'Electricity Company', category: 'Utilities', accountNumber: 'ELEC-12345' },
+    { id: '2', name: 'Water Corporation', category: 'Utilities', accountNumber: 'WATER-67890' },
+    { id: '3', name: 'Internet Provider', category: 'Telecom', accountNumber: 'NET-54321' },
+    { id: '4', name: 'Cable TV', category: 'Entertainment', accountNumber: 'TV-98765' },
+    { id: '5', name: 'Mobile Carrier', category: 'Telecom', accountNumber: 'MOBILE-13579' }
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Show error message instead of processing payment
-      throw new Error('Cannot pay bills now. Try again later.');
-      
-      // The original API call is commented out since we're showing error
-      /*
+      const amount = parseFloat(formData.amount);
+      if (isNaN(amount)) {
+        throw new Error('Please enter a valid amount');
+      }
+
+      const selectedBiller = billers.find(b => b.id === formData.billerId);
+      if (!selectedBiller) {
+        throw new Error('Please select a biller');
+      }
+
       const response = await fetch(`${API_URL}/api/bill-payments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          fromAccount: formData.bankName,
+          billerId: formData.billerId,
+          amount: amount,
+          paymentDate: formData.paymentDate,
+          reference: formData.reference
+        })
       });
 
       const data = await response.json();
@@ -83,7 +60,7 @@ export default function BillPaymentPage() {
 
       toast.success(`Bill payment of $${formData.amount} processed!`);
       router.push('/dashboard');
-      */
+
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Payment failed');
     } finally {
@@ -105,7 +82,7 @@ export default function BillPaymentPage() {
             onChange={(e) => setFormData({...formData, bankName: e.target.value})}
             className="w-full p-2 border rounded"
             required
-            readOnly // Making it read-only since it's fixed to "Global Trust Bank"
+            readOnly
           />
         </div>
 
@@ -128,7 +105,7 @@ export default function BillPaymentPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Amount </label>
+          <label className="block text-sm font-medium mb-1">Amount</label>
           <input
             type="number"
             name="amount"
