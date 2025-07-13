@@ -431,7 +431,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             </button>
           </div>
         )}
-
         {activeTab === 'login' && !showForgotPassword && !showResetPassword ? (
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
