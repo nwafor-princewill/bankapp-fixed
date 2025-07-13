@@ -69,35 +69,29 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Links Section */}
-        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Startup</h4>
+        {/* Locations Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="text-sm">
+            <h4 className="font-semibold text-[#e8742c] mb-2">New York</h4>
+            <p>Amalgamated Bank</p>
+            <p>New York, NY, United States</p>
           </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Security Center</h4>
+          <div className="text-sm">
+            <h4 className="font-semibold text-[#e8742c] mb-2">Brooklyn</h4>
+            <p>Amalgamated Bank</p>
+            <p>Brooklyn, NY, United States</p>
           </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Privacy Policy</h4>
+          <div className="text-sm">
+            <h4 className="font-semibold text-[#e8742c] mb-2">Bronx</h4>
+            <p>Amalgamated Bank</p>
+            <p>Bronx, NY, United States</p>
+            <p className="mt-2">
+              Phone: <a href="tel:+1-780-476-1737" className="text-[#e8742c] hover:underline">+1-780-476-1737</a>
+            </p>
           </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Your Privacy Rights</h4>
-          </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Online Privacy Policy</h4>
-          </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Consumer Account Opening Disclosure</h4>
-          </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Small Business Account Opening Disclosure</h4>
-          </div>
-          <div>
-            <h4 className="font-bold mb-2 text-[#e8742c]">Terms of Use</h4>
-          </div>
-        </div> */}
+        </div>
 
-                {/* Links Section */}
+        {/* Links Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div>
             <h4 className="font-bold mb-2 text-[#e8742c]">Startup</h4>
