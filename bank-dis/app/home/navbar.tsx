@@ -49,7 +49,7 @@ const Navbar = () => {
 
    const topNavItems = [
     { name: 'Contact us', path: '/contact' },
-    { name: 'Locations', path: '/locations' },
+    // { name: 'Locations', path: '/locations' },
     // { name: 'Investor Relations', path: '/investor-relations' },
     { name: 'FAQs', path: '/faqs' }
   ];
