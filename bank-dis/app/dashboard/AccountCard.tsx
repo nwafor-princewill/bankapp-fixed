@@ -52,10 +52,10 @@ const AccountCard: React.FC<AccountCardProps> = ({
           </div>
         )}
         
-        <div>
+        {/* <div>
           <p className="text-sm text-gray-500">Account Type</p>
           <p className="font-medium">{accountType}</p>
-        </div>
+        </div> */}
 
         {openingDate && (
           <div>
