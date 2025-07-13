@@ -15,7 +15,8 @@ interface AuthModalsProps {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Supported currencies
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY'] as const;
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY','INR', 'KRW', 'BRL', 'MXN', 'SGD', 'HKD', 'SEK', 'NOK', 
+  'ZAR', 'RUB', 'TRY', 'NGN'] as const;
 
 // Security questions
 const SECURITY_QUESTIONS = [
