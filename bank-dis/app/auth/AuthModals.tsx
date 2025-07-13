@@ -358,6 +358,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       });
 
       const data = await response.json();
+
+        if (data.success) {
+        // Close ALL modals and reload the page
+        onClose();
+        window.location.href = '/'; // Full refresh shows AuthModal again
+      }
       
       if (!response.ok) {
         throw new Error(data.message || 'Failed to reset password');
@@ -365,10 +371,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
       setResetSuccess(true);
       setTimeout(() => {
-        setShowResetPassword(false);
-        setResetSuccess(false);
-        setActiveTab('login');
-      }, 3000);
+        onClose();
+        window.location.href = '/'
+        // setShowResetPassword(false);
+        // setResetSuccess(false);
+        // setActiveTab('login');
+      }, 2000);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reset password');
