@@ -141,14 +141,14 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
                 </p>
               </div>
             </div>
-            <div className="mt-3 flex space-x-2">
+            {/* <div className="mt-3 flex space-x-2">
               <button className="text-sm bg-[#03305c] text-white px-3 py-1 rounded hover:bg-[#e8742c] transition-colors">
                 Transfer
               </button>
               <button className="text-sm border border-[#03305c] text-[#03305c] px-3 py-1 rounded hover:bg-gray-100 transition-colors">
                 Details
               </button>
-            </div>
+            </div> */}
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-sm">
