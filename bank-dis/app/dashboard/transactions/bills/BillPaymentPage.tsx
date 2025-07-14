@@ -31,7 +31,7 @@ export default function BillPaymentPage() {
 
   try {
     const amount = parseFloat(formData.amount);
-    if (isNaN(amount)) {
+    if (isNaN(amount) || amount <= 0) {
       throw new Error('Please enter a valid amount');
     }
 
@@ -47,7 +47,6 @@ export default function BillPaymentPage() {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify({
-        fromAccount: formData.bankName,
         billerId: formData.billerId,
         amount: amount,
         paymentDate: formData.paymentDate,
@@ -58,9 +57,9 @@ export default function BillPaymentPage() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Payment failed');
 
-    toast.success(`Bill payment of $${amount.toFixed(2)} to ${selectedBiller.name} was successful!`);
+    toast.success(`Payment of $${amount.toFixed(2)} to ${selectedBiller.name} was successful!`);
     
-    // Reset form with new reference number
+    // Reset form
     setFormData({
       bankName: 'Amalgamated Bank',
       billerId: '',
