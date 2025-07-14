@@ -1,53 +1,72 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { FiBell, FiUser, FiSun, FiMoon, FiCamera, FiEdit2 } from 'react-icons/fi';
+import { FiBell, FiUser, FiCamera, FiEdit2 } from 'react-icons/fi';
 import { usePathname } from 'next/navigation';
 
 const DashboardNav = () => {
   const [userName, setUserName] = useState('');
   const [userProfilePicture, setUserProfilePicture] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showUploadHover, setShowUploadHover] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
 
-  useEffect(() => {
-    // Get user data
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      const user = JSON.parse(userString);
-      if (user && user.firstName) {
-        setUserName(`${user.firstName} ${user.lastName}`);
-        setUserProfilePicture(user.profilePicture || '');
+  // Function to fetch user data from the backend
+  const fetchUserData = async () => {
+    try {
+      const userString = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      
+      if (userString && token) {
+        const user = JSON.parse(userString);
+        const userId = user?.id || user?._id;
+        
+        if (userId) {
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+          
+          const response = await fetch(`${backendUrl}/api/users/${userId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            
+            // Update state with fresh data from database
+            setUserName(`${userData.firstName} ${userData.lastName}`);
+            setUserProfilePicture(userData.profilePicture || '');
+            
+            // Update localStorage with fresh data
+            const updatedUser = { ...user, ...userData };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          } else {
+            // Fallback to localStorage data if API fails
+            setUserName(`${user.firstName} ${user.lastName}`);
+            setUserProfilePicture(user.profilePicture || '');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      // Fallback to localStorage data if API fails
+      const userString = localStorage.getItem('user');
+      if (userString) {
+        const user = JSON.parse(userString);
+        if (user && user.firstName) {
+          setUserName(`${user.firstName} ${user.lastName}`);
+          setUserProfilePicture(user.profilePicture || '');
+        }
       }
     }
-    
-    // Get dark mode preference
-    const darkModePreference = localStorage.getItem('darkMode');
-    if (darkModePreference) {
-      setIsDarkMode(darkModePreference === 'true');
-    } else {
-      // Check system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(systemPrefersDark);
-    }
-  }, []);
+  };
 
   useEffect(() => {
-    // Apply dark mode to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    // Save preference
-    localStorage.setItem('darkMode', isDarkMode.toString());
-  }, [isDarkMode]);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+    // Fetch fresh user data from backend on component mount
+    fetchUserData();
+  }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
@@ -131,24 +150,15 @@ const DashboardNav = () => {
   const currentPage = pathname.split('/').pop()?.replace('-', ' ') || 'Dashboard';
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+    <header className="bg-white border-b border-gray-200 transition-colors duration-200">
       <div className="flex items-center justify-between px-6 py-4">
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100 capitalize">
+        <h1 className="text-xl font-semibold text-gray-800 capitalize">
           {currentPage}
         </h1>
                 
         <div className="flex items-center space-x-4">
-          {/* Dark Mode Toggle */}
-          <button 
-            onClick={toggleDarkMode}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-[#03305c] dark:hover:text-blue-400 transition-colors duration-200"
-            aria-label="Toggle dark mode"
-          >
-            {isDarkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-          </button>
-          
           {/* Notifications */}
-          <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-[#03305c] dark:hover:text-blue-400 relative transition-colors duration-200">
+          <button className="p-2 text-gray-600 hover:text-[#03305c] relative transition-colors duration-200">
             <FiBell size={20} />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
@@ -156,7 +166,7 @@ const DashboardNav = () => {
           {/* User Profile with Picture Upload */}
           <div className="flex items-center space-x-2">
             <div 
-              className="relative w-8 h-8 rounded-full bg-[#03305c] dark:bg-blue-600 flex items-center justify-center text-white transition-colors duration-200 cursor-pointer group"
+              className="relative w-8 h-8 rounded-full bg-[#03305c] flex items-center justify-center text-white transition-colors duration-200 cursor-pointer group"
               onMouseEnter={() => setShowUploadHover(true)}
               onMouseLeave={() => setShowUploadHover(false)}
               onClick={triggerFileInput}
@@ -193,7 +203,7 @@ const DashboardNav = () => {
               disabled={isUploading}
             />
             
-            <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
+            <span className="text-sm font-medium text-gray-800">
               {userName || 'User'}
             </span>
           </div>
