@@ -26,47 +26,55 @@ export default function BillPaymentPage() {
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const amount = parseFloat(formData.amount);
-      if (isNaN(amount)) {
-        throw new Error('Please enter a valid amount');
-      }
-
-      const selectedBiller = billers.find(b => b.id === formData.billerId);
-      if (!selectedBiller) {
-        throw new Error('Please select a biller');
-      }
-
-      const response = await fetch(`${API_URL}/api/bill-payments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          fromAccount: formData.bankName,
-          billerId: formData.billerId,
-          amount: amount,
-          paymentDate: formData.paymentDate,
-          reference: formData.reference
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Payment failed');
-
-      toast.success(`Bill payment of $${formData.amount} processed!`);
-      router.push('/dashboard');
-
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Payment failed');
-    } finally {
-      setLoading(false);
+  try {
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount)) {
+      throw new Error('Please enter a valid amount');
     }
-  };
+
+    const selectedBiller = billers.find(b => b.id === formData.billerId);
+    if (!selectedBiller) {
+      throw new Error('Please select a biller');
+    }
+
+    const response = await fetch(`${API_URL}/api/bill-payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        fromAccount: formData.bankName,
+        billerId: formData.billerId,
+        amount: amount,
+        paymentDate: formData.paymentDate,
+        reference: formData.reference
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Payment failed');
+
+    toast.success(`Bill payment of $${amount.toFixed(2)} to ${selectedBiller.name} was successful!`);
+    
+    // Reset form with new reference number
+    setFormData({
+      bankName: 'Amalgamated Bank',
+      billerId: '',
+      amount: '',
+      paymentDate: new Date().toISOString().split('T')[0],
+      reference: `BILL-${Date.now()}`
+    });
+
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Payment failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
