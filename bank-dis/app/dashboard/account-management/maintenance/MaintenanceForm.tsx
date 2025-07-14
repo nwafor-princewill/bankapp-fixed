@@ -72,7 +72,7 @@ export default function MaintenanceForm() {
     <div className="bg-white p-6 rounded-lg shadow">
       <h2 className="text-xl font-bold mb-4">Account Maintenance Request</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium mb-1">Account</label>
           <select
             value={formData.accountNumber}
@@ -87,7 +87,7 @@ export default function MaintenanceForm() {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         <div>
           <label className="block text-sm font-medium mb-1">Request Type</label>
