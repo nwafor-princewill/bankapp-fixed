@@ -158,10 +158,10 @@ const DashboardNav = () => {
                 
         <div className="flex items-center space-x-4">
           {/* Notifications */}
-          <button className="p-2 text-gray-600 hover:text-[#03305c] relative transition-colors duration-200">
+          {/* <button className="p-2 text-gray-600 hover:text-[#03305c] relative transition-colors duration-200">
             <FiBell size={20} />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          </button> */}
           
           {/* User Profile with Picture Upload */}
           <div className="flex items-center space-x-2">
