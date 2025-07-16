@@ -125,7 +125,7 @@ export default function BillPaymentPage() {
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium mb-1">Payment Date</label>
           <input
             type="date"
@@ -135,7 +135,7 @@ export default function BillPaymentPage() {
             className="w-full p-2 border rounded"
             required
           />
-        </div>
+        </div> */}
 
         <button
           type="submit"
