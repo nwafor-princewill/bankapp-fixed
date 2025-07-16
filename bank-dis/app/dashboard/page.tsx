@@ -127,7 +127,9 @@ const DashboardPage = () => {
           
           {/* Desktop: TransactionHistory spanning full width */}
           <div className="hidden lg:block">
-            <TransactionHistory accountNumber={primaryAccount.accountNumber} />
+            <TransactionHistory 
+            accountNumber={primaryAccount.accountNumber} 
+            currency={primaryAccount.currency} />
           </div>
           
           {/* Desktop: CryptoTransactions */}
@@ -148,7 +150,9 @@ const DashboardPage = () => {
 
         {/* Mobile Order #4: TransactionHistory (shown only on mobile) */}
         <div className="lg:hidden">
-          <TransactionHistory accountNumber={primaryAccount.accountNumber} />
+          <TransactionHistory 
+          accountNumber={primaryAccount.accountNumber} 
+           currency={primaryAccount.currency} />
         </div>
 
         {/* Mobile Order #5: CryptoSummary (shown only on mobile) */}

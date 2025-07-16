@@ -19,7 +19,7 @@ interface Transaction {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const TransactionHistory = ({ accountNumber }: { accountNumber: string }) => {
+const TransactionHistory = ({ accountNumber, currency }: { accountNumber: string; currency: string }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +112,8 @@ const TransactionHistory = ({ accountNumber }: { accountNumber: string }) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      // currency: 'USD'
+      currency: currency
     }).format(amount);
   };
 
