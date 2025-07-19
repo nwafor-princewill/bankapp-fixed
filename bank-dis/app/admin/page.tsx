@@ -246,6 +246,34 @@ export default function AdminDashboard() {
     }
   };
 
+  //delete user
+  const deleteUser = async (userId: string) => {
+  if (!confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/admin/delete-user/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      toast.success(data.message);
+      setUsers(users.filter(user => user._id !== userId));
+    } else {
+      throw new Error(data.message || 'Failed to delete user');
+    }
+  } catch (err) {
+    console.error('Delete user failed:', err);
+    toast.error(err instanceof Error ? err.message : 'Operation failed');
+  }
+};
+
   const handleBtcUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -539,7 +567,8 @@ export default function AdminDashboard() {
                         {user.status || 'active'}
                       </span>
                     </td>
-                    <td className="p-2">
+
+                    <td className="p-2 flex gap-2">
                       <button
                         onClick={() => toggleBlockUser(user._id, user.status === 'blocked')}
                         className={`px-3 py-1 rounded text-white text-sm ${
@@ -548,7 +577,14 @@ export default function AdminDashboard() {
                       >
                         {user.status === 'active' ? 'Block' : 'Unblock'}
                       </button>
+                      <button
+                        onClick={() => deleteUser(user._id)}
+                        className="px-3 py-1 rounded text-white text-sm bg-red-700 hover:bg-red-800"
+                      >
+                        Delete
+                      </button>
                     </td>
+
                   </tr>
                 ))}
               </tbody>
