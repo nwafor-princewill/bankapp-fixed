@@ -49,6 +49,15 @@ const DashboardSidebar = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleLogout = () => {
+  if (confirm('Are you sure you want to logout?')) {
+    // Clear user token from localStorage
+    localStorage.removeItem('token');
+    // Redirect to home page
+    window.location.href = '/';
+  }
+};
+
   return (
     <>
       {/* Mobile Menu Button */}
@@ -200,6 +209,18 @@ const DashboardSidebar = () => {
               </ul>
             )}
           </div>
+
+          {/* Logout Button - Added at the bottom of the sidebar */}
+          <div className="mt-auto p-4 border-t border-[#1e4770]">
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-3 py-2 rounded-md hover:bg-[#1e4770] text-white transition-colors duration-200"
+            >
+              <FiExternalLink className="mr-3" size={18} />
+              Logout
+            </button>
+          </div>
+          
         </div>
       </div>
     </>
