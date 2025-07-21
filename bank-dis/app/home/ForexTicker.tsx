@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react';
 const ForexTicker = () => {
   // Hardcoded fallback values (using your initial prices)
   const HARDCODED_DATA = [
-    { pair: "EUR/USD", price: 1.08, change: 0 },
-    { pair: "GBP/USD", price: 1.26, change: 0 },
-    { pair: "USD/JPY", price: 151.50, change: 0 },
-    { pair: "USD/CAD", price: 1.36, change: 0 },
-    { pair: "AUD/USD", price: 0.66, change: 0 },
-    { pair: "USD/CHF", price: 0.91, change: 0 },
-    { pair: "NZD/USD", price: 0.60, change: 0 },
-    { pair: "USD/CNY", price: 7.24, change: 0 }
+    { pair: "EUR/USD", price: 1.08, change: 1.16 },
+    { pair: "GBP/USD", price: 1.26, change: 1.34 },
+    { pair: "USD/JPY", price: 151.50, change: 148.49 },
+    { pair: "USD/CAD", price: 1.36, change: 1.37 },
+    { pair: "AUD/USD", price: 0.66, change: 0.65 },
+    { pair: "USD/CHF", price: 0.91, change: 0.80 },
+    { pair: "NZD/USD", price: 0.60, change: 0.60 },
+    { pair: "USD/CNY", price: 7.24, change: 7.18 }
   ];
 
   const [forexData, setForexData] = useState(HARDCODED_DATA);
