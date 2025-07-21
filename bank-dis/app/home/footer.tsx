@@ -60,11 +60,7 @@ const Footer = () => {
               <a href="tel:+44-7469-549275" className="text-[#e8742c] hover:underline">
                 +44-7469-549275
               </a>{' '}
-              for assistance
-              {/* <a href="#" className="text-[#e8742c] hover:underline">
-                click here
-              </a>{' '} */}
-               communicate with our Contact Center via instant text message chat.
+              for assistance communicate with our Contact Center via instant text message chat.
             </p>
           </div>
         </div>
