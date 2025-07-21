@@ -78,7 +78,7 @@ const ContactPage = () => {
           <h2 className="text-3xl font-bold text-[#03305c] mb-6">Other Ways to Connect</h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { title: "Mail", detail: "amalgamateedbank@gmail.com\nNew York, NY 10001" },
+              { title: "Mail", detail: "amalgamateedbank@gmail.com\nManchester, United Kingdom, NY 10001" },
               { title: "Secure Message", detail: "Log in to online banking to send a secure message" },
               { title: "Social Media", detail: "Connect with us on Twitter, Facebook, and LinkedIn" },
             ].map((item, index) => (

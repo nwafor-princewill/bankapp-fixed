@@ -60,11 +60,11 @@ const Footer = () => {
               <a href="tel:+44-7469-549275" className="text-[#e8742c] hover:underline">
                 +44-7469-549275
               </a>{' '}
-              for assistance or{' '}
-              <a href="#" className="text-[#e8742c] hover:underline">
+              for assistance
+              {/* <a href="#" className="text-[#e8742c] hover:underline">
                 click here
-              </a>{' '}
-              to communicate with our Contact Center via instant text message chat.
+              </a>{' '} */}
+               communicate with our Contact Center via instant text message chat.
             </p>
           </div>
         </div>
@@ -72,19 +72,19 @@ const Footer = () => {
         {/* Locations Section */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="text-sm">
-            <h4 className="font-semibold text-[#e8742c] mb-2">New York</h4>
+            <h4 className="font-semibold text-[#e8742c] mb-2">Manchester</h4>
             <p>Amalgamated Bank</p>
-            <p>New York, NY, United States</p>
+            <p>Manchester, United Kingdom</p>
           </div>
           <div className="text-sm">
             <h4 className="font-semibold text-[#e8742c] mb-2">Brooklyn</h4>
             <p>Amalgamated Bank</p>
-            <p>Brooklyn, NY, United States</p>
+            <p>Glasgow, United Kingdom</p>
           </div>
           <div className="text-sm">
             <h4 className="font-semibold text-[#e8742c] mb-2">Bronx</h4>
             <p>Amalgamated Bank</p>
-            <p>Bronx, NY, United States</p>
+            <p>Bristol, United Kingdom</p>
             <p className="mt-2">
               Phone: <a href="tel:+44-7469-549275" className="text-[#e8742c] hover:underline">+44-7469-549275</a>
             </p>
