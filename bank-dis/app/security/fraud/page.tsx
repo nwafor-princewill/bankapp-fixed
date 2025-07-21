@@ -21,7 +21,7 @@ export default function FraudPreventionPage() {
         
         <p className="mt-8 text-[#03305c] font-medium">
           If you suspect fraudulent activity, contact us immediately at 
-          amalgamateedbank@gmail.com or call our 24/7 fraud hotline at +1-780-476-1737.
+          amalgamateedbank@gmail.com or call our 24/7 fraud hotline at +44-7469-549275.
         </p>
       </div>
     </div>

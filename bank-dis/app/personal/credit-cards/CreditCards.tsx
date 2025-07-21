@@ -182,7 +182,7 @@ const CreditCards = () => {
                   <p className="text-sm text-gray-600">Call us.</p>
                 </div>
               </div>
-              <p className="text-lg font-semibold text-gray-900">+1-780-476-1737</p>
+              <p className="text-lg font-semibold text-gray-900">+44-7469-549275</p>
             </div>
 
             {/* Quick Links */}

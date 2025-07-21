@@ -66,7 +66,7 @@ const ContactUs = () => {
                     <FiPhone className="text-[#03305c] mr-3" size={24} />
                     <h3 className="text-xl font-semibold text-[#03305c]">Have questions?</h3>
                   </div>
-                  <p className="text-2xl font-bold text-[#e8742c] mb-2">+1-780-476-1737</p>
+                  <p className="text-2xl font-bold text-[#e8742c] mb-2">+44-7469-549275</p>
                   <div className="flex items-center text-gray-600">
                     <FiMapPin className="mr-2" size={16} />
                     <span>In person: Find a location</span>
@@ -81,37 +81,37 @@ const ContactUs = () => {
                   <div className="border-l-4 border-[#e8742c] pl-4">
                     <h4 className="font-semibold text-[#03305c]">Personal Banking</h4>
                     <p className="text-gray-600 text-sm">Mon. - Fri. 8 AM - 8 PM & Sat. 9 AM - 2 PM ET</p>
-                    <p className="font-bold text-[#03305c]">+1-780-476-1737</p>
+                    <p className="font-bold text-[#03305c]">+44-7469-549275</p>
                   </div>
 
                   <div className="border-l-4 border-[#e8742c] pl-4">
                     <h4 className="font-semibold text-[#03305c]">Lost or Stolen Card</h4>
                     <p className="text-gray-600 text-sm">24 hours / 7 days a week</p>
-                    <p className="font-bold text-[#03305c]">+1-780-476-1737</p>
+                    <p className="font-bold text-[#03305c]">amalgamateedbank@gmail.com</p>
                   </div>
 
                   <div className="border-l-4 border-[#e8742c] pl-4">
                     <h4 className="font-semibold text-[#03305c]">Online Banking / Password Resets</h4>
                     <p className="text-gray-600 text-sm">24 hours / 7 days a week</p>
-                    <p className="font-bold text-[#03305c]">+1-780-476-1737 (option 2)</p>
+                    <p className="font-bold text-[#03305c]">+44-7469-549275 (option 2)</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                     <div>
                       <h5 className="font-medium text-[#03305c]">Fraud Help Line</h5>
-                      <p className="text-sm font-bold">+1-780-476-1737</p>
+                      <p className="text-sm font-bold">+44-7469-549275</p>
                     </div>
                     <div>
                       <h5 className="font-medium text-[#03305c]">Consumer Credit Card</h5>
-                      <p className="text-sm font-bold">+1-780-476-1737</p>
+                      <p className="text-sm font-bold">amalgamateedbank@gmail.com</p>
                     </div>
                     <div>
                       <h5 className="font-medium text-[#03305c]">Business Credit Card</h5>
-                      <p className="text-sm font-bold">+1-780-476-1737</p>
+                      <p className="text-sm font-bold">amalgamateedbank@gmail.com</p>
                     </div>
                     <div>
                       <h5 className="font-medium text-[#03305c]">Political Banking</h5>
-                      <p className="text-sm font-bold">+1-780-476-1737</p>
+                      <p className="text-sm font-bold">+44-7469-549275</p>
                     </div>
                   </div>
                 </div>
@@ -123,12 +123,12 @@ const ContactUs = () => {
               <div className="bg-gray-50 p-6 rounded-lg">
                 <h4 className="font-semibold text-[#03305c] mb-2">Commercial and Organization Banking</h4>
                 <p className="text-sm text-gray-600 mb-1">Mon. - Fri. 8 AM - 5 PM ET</p>
-                <p className="font-bold text-[#03305c]">+1-780-476-1737</p>
+                <p className="font-bold text-[#03305c]">+44-7469-549275</p>
               </div>
               <div className="bg-gray-50 p-6 rounded-lg">
                 <h4 className="font-semibold text-[#03305c] mb-2">Investment Management</h4>
                 <p className="text-sm text-gray-600 mb-1">Mon. - Fri. 9 AM - 5 PM ET</p>
-                <p className="font-bold text-[#03305c]">+1-780-476-1737</p>
+                <p className="font-bold text-[#03305c]">amalgamateedbank@gmail.com</p>
               </div>
             </div>
 

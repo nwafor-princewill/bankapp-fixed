@@ -143,7 +143,7 @@ const BankingFeatures = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
               <div>
                 <h4 className="font-bold text-[#e8742c] mb-2">Phone Support</h4>
-                <p className="text-[#03305c] font-semibold">+1-780-476-1737</p>
+                <p className="text-[#03305c] font-semibold">+44-7469-549275</p>
                 <p className="text-gray-600 text-sm">Available 24/7 for your convenience</p>
               </div>
               <div>

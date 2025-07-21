@@ -21,7 +21,7 @@ const FAQPage = () => {
         },
         {
           question: "What should I do if I suspect fraud?",
-          answer: "Contact us immediately at 800-662-0860. We'll secure your account, investigate any suspicious activity, and help you recover any lost funds."
+          answer: "Contact us immediately at +44-7469-549275. We'll secure your account, investigate any suspicious activity, and help you recover any lost funds."
         }
       ]
     },
@@ -45,11 +45,11 @@ const FAQPage = () => {
       questions: [
         {
           question: "How do I activate my new debit card?",
-          answer: "Call the number on the activation sticker or activate through online banking. You'll need your card number and may need to verify your identity."
+          answer: "Call the number on the activation sticker +44-7469-549275 or activate through online banking. You'll need your card number and may need to verify your identity."
         },
         {
           question: "What should I do if my card is lost or stolen?",
-          answer: "Call us immediately at 800-500-1044 (24/7) to report it. We'll cancel the card and send you a replacement within 3-5 business days."
+          answer: "Call us immediately at +44-7469-549275 (24/7) to report it. We'll cancel the card and send you a replacement within 3-5 business days."
         }
       ]
     },
@@ -115,7 +115,7 @@ const FAQPage = () => {
             <p>Our Customer Service team is available to help with fraud and security concerns.</p>
           </div>
           <div className="bg-[#e8742c] text-white px-6 py-3 rounded-lg font-bold">
-            +1-780-476-1737
+            +44-7469-549275
           </div>
         </div>
 

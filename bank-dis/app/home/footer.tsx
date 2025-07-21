@@ -57,8 +57,8 @@ const Footer = () => {
           <div className="text-sm">
             <p>
               If you are using a screen reader and having problems using this website, please call{' '}
-              <a href="tel:+1-780-476-1737" className="text-[#e8742c] hover:underline">
-                +1-780-476-1737
+              <a href="tel:+44-7469-549275" className="text-[#e8742c] hover:underline">
+                +44-7469-549275
               </a>{' '}
               for assistance or{' '}
               <a href="#" className="text-[#e8742c] hover:underline">
@@ -86,7 +86,7 @@ const Footer = () => {
             <p>Amalgamated Bank</p>
             <p>Bronx, NY, United States</p>
             <p className="mt-2">
-              Phone: <a href="tel:+1-780-476-1737" className="text-[#e8742c] hover:underline">+1-780-476-1737</a>
+              Phone: <a href="tel:+44-7469-549275" className="text-[#e8742c] hover:underline">+44-7469-549275</a>
             </p>
           </div>
         </div>

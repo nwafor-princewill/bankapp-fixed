@@ -118,8 +118,8 @@ const PrivacyPolicy = () => {
             <section className="mt-8 pt-6 border-t border-gray-200">
               <div className="bg-[#03305c] text-white p-6 rounded-lg text-center">
                 <h3 className="text-xl font-semibold mb-2">Questions?</h3>
-                <p className="text-lg">Call toll-free: <span className="font-bold">+1-780-476-1737</span></p>
-                <p className="text-sm mt-2 opacity-90">© 2024 Amalgamated Bank. All rights reserved.</p>
+                <p className="text-lg">Call toll-free: <span className="font-bold">+44-7469-549275</span></p>
+                <p className="text-sm mt-2 opacity-90">© 2025 Amalgamated Bank. All rights reserved.</p>
               </div>
             </section>
           </div>
