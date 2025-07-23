@@ -19,7 +19,7 @@ export default function InternationalTransferPage() {
     swiftIban: '',
     email: '',
     phone: '',
-    amount: '', // ONLY ADDED FIELD
+    amount: '',
     description: 'International Transfer'
   });
 
@@ -48,6 +48,7 @@ export default function InternationalTransferPage() {
         setCurrency(data.currency ?? data.data?.currency ?? 'USD');
       } catch (error) {
         console.error('Error fetching balance:', error);
+        toast.error('Failed to load account balance');
         setCurrentBalance(0);
         setCurrency('USD');
       }
@@ -56,7 +57,7 @@ export default function InternationalTransferPage() {
     fetchBalance();
   }, [router]);
 
-  // EXISTING SUBMIT HANDLER (ONLY ADDED AMOUNT VALIDATION)
+  // FIXED SUBMIT HANDLER
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -71,10 +72,22 @@ export default function InternationalTransferPage() {
       return;
     }
 
+    // Validate required fields for international transfer
+    if (!formData.accountNumber || !formData.accountName || !formData.bankName || !formData.swiftIban) {
+      toast.error('Please fill in all required fields (Account Number, Account Name, Bank Name, SWIFT/IBAN)');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
+      // FIX: Send proper payload structure matching backend expectations
       const response = await fetch(`${API_URL}/api/transfers`, {
         method: 'POST',
         headers: {
@@ -82,24 +95,49 @@ export default function InternationalTransferPage() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          ...formData,
-          amount: amount, // ADDED TO EXISTING PAYLOAD
-          transferType: 'international'
+          // FIX: Map frontend fields to backend expected fields
+          toAccount: formData.accountNumber, // Backend expects 'toAccount'
+          amount: amount, // Numeric amount
+          description: formData.description,
+          transferType: 'international', // Explicitly set transfer type
+          // International-specific fields
+          accountName: formData.accountName,
+          bankName: formData.bankName,
+          bankAddress: formData.bankAddress,
+          swiftIban: formData.swiftIban,
+          email: formData.email,
+          phone: formData.phone
         })
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Transfer failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'International transfer failed');
+      }
 
-      toast.success(`Transfer of ${amount.toFixed(2)} ${currency} initiated!`, {
+      const data = await response.json();
+      toast.success(`International transfer of ${amount.toFixed(2)} ${currency} initiated successfully!`, {
         autoClose: 5000
       });
       
       // Update local balance
       setCurrentBalance(prev => prev - amount);
       
+      // Reset form
+      setFormData({
+        accountNumber: '',
+        accountName: '',
+        bankName: '',
+        bankAddress: '',
+        swiftIban: '',
+        email: '',
+        phone: '',
+        amount: '',
+        description: 'International Transfer'
+      });
+      
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Transfer failed';
+      const errorMessage = error instanceof Error ? error.message : 'International transfer failed';
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -123,34 +161,37 @@ export default function InternationalTransferPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* ALL EXISTING INTERNATIONAL FIELDS */}
         <div>
-          <label className="block text-sm font-medium mb-1">Account Number</label>
+          <label className="block text-sm font-medium mb-1">Account Number *</label>
           <input
             type="text"
             value={formData.accountNumber}
             onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
             className="w-full p-2 border rounded"
+            placeholder="Enter recipient account number"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Account Name</label>
+          <label className="block text-sm font-medium mb-1">Account Name *</label>
           <input
             type="text"
             value={formData.accountName}
             onChange={(e) => setFormData({...formData, accountName: e.target.value})}
             className="w-full p-2 border rounded"
+            placeholder="Enter account holder name"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Bank Name</label>
+          <label className="block text-sm font-medium mb-1">Bank Name *</label>
           <input
             type="text"
             value={formData.bankName}
             onChange={(e) => setFormData({...formData, bankName: e.target.value})}
             className="w-full p-2 border rounded"
+            placeholder="Enter bank name"
             required
           />
         </div>
@@ -162,17 +203,18 @@ export default function InternationalTransferPage() {
             value={formData.bankAddress}
             onChange={(e) => setFormData({...formData, bankAddress: e.target.value})}
             className="w-full p-2 border rounded"
-            required
+            placeholder="Enter bank address"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">SWIFT/IBAN</label>
+          <label className="block text-sm font-medium mb-1">SWIFT/IBAN *</label>
           <input
             type="text"
             value={formData.swiftIban}
             onChange={(e) => setFormData({...formData, swiftIban: e.target.value})}
             className="w-full p-2 border rounded"
+            placeholder="Enter SWIFT or IBAN code"
             required
           />
         </div>
@@ -184,7 +226,7 @@ export default function InternationalTransferPage() {
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
             className="w-full p-2 border rounded"
-            required
+            placeholder="Enter recipient email"
           />
         </div>
 
@@ -195,13 +237,13 @@ export default function InternationalTransferPage() {
             value={formData.phone}
             onChange={(e) => setFormData({...formData, phone: e.target.value})}
             className="w-full p-2 border rounded"
-            required
+            placeholder="Enter recipient phone"
           />
         </div>
 
-        {/* NEW AMOUNT FIELD (ONLY ADDITION) */}
+        {/* AMOUNT FIELD */}
         <div>
-          <label className="block text-sm font-medium mb-1">Amount ({currency})</label>
+          <label className="block text-sm font-medium mb-1">Amount ({currency}) *</label>
           <input
             type="number"
             value={formData.amount}
@@ -210,6 +252,7 @@ export default function InternationalTransferPage() {
             min="0.01"
             step="0.01"
             max={currentBalance}
+            placeholder="Enter transfer amount"
             required
           />
         </div>
@@ -221,10 +264,11 @@ export default function InternationalTransferPage() {
             value={formData.description}
             onChange={(e) => setFormData({...formData, description: e.target.value})}
             className="w-full p-2 border rounded"
+            placeholder="Transfer description"
           />
         </div>
 
-        {/* UPDATED TRANSFER BUTTON (ONLY VISUAL CHANGE) */}
+        {/* TRANSFER BUTTON */}
         <button
           type="submit"
           disabled={loading}
