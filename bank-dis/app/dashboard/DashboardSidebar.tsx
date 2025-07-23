@@ -11,7 +11,13 @@ const menuItems = [
   // The path for the main dashboard is now correct.
   { id: 'dashboard', label: 'Dashboard', icon: <FiHome size={20} />, path: '/dashboard' },
   // I've updated the paths below to match your complex href logic for consistency.
-  { id: 'transfers', label: 'Transfers', icon: <MdPayment size={20} />, path: '/dashboard/transactions/transfer' },
+  { id: 'transfers', label: 'Transfers', icon: <MdPayment size={20} />, path: '/dashboard/transactions/transfer',
+   subItems: [
+      { id: 'internal-transfer', label: 'Internal Transfer', path: '/dashboard/transactions/transfer/internal' },
+      { id: 'other-banks', label: 'Other Banks', path: '/dashboard/transactions/transfer/other-banks' },
+      { id: 'international', label: 'International', path: '/dashboard/transactions/transfer/international' }
+    ]
+  },
   { id: 'bill-payments', label: 'Bill Payments', icon: <MdReceipt size={20} />, path: '/dashboard/transactions/bills' },
   { id: 'redeem-funds', label: 'Redeem Funds', icon: <FaMoneyBillWave size={20} />, path: '/dashboard/transactions/redeem' },
   { id: 'card-management', label: 'Card Management', icon: <MdCreditCard size={20} />, path: '/dashboard/transactions/card' },
