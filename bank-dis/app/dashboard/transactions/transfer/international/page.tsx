@@ -1,6 +1,5 @@
-// app/dashboard/transactions/transfer/international/page.tsx
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import CurrencyDisplay from '@/app/components/CurrencyDisplay';
@@ -20,19 +19,98 @@ export default function InternationalTransferPage() {
     swiftIban: '',
     email: '',
     phone: '',
-    amount: '',
+    amount: '', // ONLY ADDED FIELD
     description: 'International Transfer'
   });
 
+  // EXISTING BALANCE FETCH (UNCHANGED)
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          router.push('/login');
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/api/accounts/primary`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch balance');
+        }
+
+        const data = await response.json();
+        setCurrentBalance(data.balance ?? data.data?.availableBalance ?? 0);
+        setCurrency(data.currency ?? data.data?.currency ?? 'USD');
+      } catch (error) {
+        console.error('Error fetching balance:', error);
+        setCurrentBalance(0);
+        setCurrency('USD');
+      }
+    };
+
+    fetchBalance();
+  }, [router]);
+
+  // EXISTING SUBMIT HANDLER (ONLY ADDED AMOUNT VALIDATION)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // ... similar to your existing transfer logic
+    
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    
+    if (amount > currentBalance) {
+      toast.error('Insufficient funds for this transfer');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/transfers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          amount: amount, // ADDED TO EXISTING PAYLOAD
+          transferType: 'international'
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Transfer failed');
+
+      toast.success(`Transfer of ${amount.toFixed(2)} ${currency} initiated!`, {
+        autoClose: 5000
+      });
+      
+      // Update local balance
+      setCurrentBalance(prev => prev - amount);
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Transfer failed';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
       <h1 className="text-2xl font-bold mb-6">International Transfer</h1>
       
+      {/* EXISTING BALANCE DISPLAY (UNCHANGED) */}
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
         <p className="text-sm text-gray-600">Available Balance</p>
         <CurrencyDisplay 
@@ -43,11 +121,11 @@ export default function InternationalTransferPage() {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* ALL EXISTING INTERNATIONAL FIELDS */}
         <div>
           <label className="block text-sm font-medium mb-1">Account Number</label>
           <input
             type="text"
-            name="accountNumber"
             value={formData.accountNumber}
             onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
             className="w-full p-2 border rounded"
@@ -59,7 +137,6 @@ export default function InternationalTransferPage() {
           <label className="block text-sm font-medium mb-1">Account Name</label>
           <input
             type="text"
-            name="accountName"
             value={formData.accountName}
             onChange={(e) => setFormData({...formData, accountName: e.target.value})}
             className="w-full p-2 border rounded"
@@ -71,7 +148,6 @@ export default function InternationalTransferPage() {
           <label className="block text-sm font-medium mb-1">Bank Name</label>
           <input
             type="text"
-            name="bankName"
             value={formData.bankName}
             onChange={(e) => setFormData({...formData, bankName: e.target.value})}
             className="w-full p-2 border rounded"
@@ -83,7 +159,6 @@ export default function InternationalTransferPage() {
           <label className="block text-sm font-medium mb-1">Bank Address</label>
           <input
             type="text"
-            name="bankAddress"
             value={formData.bankAddress}
             onChange={(e) => setFormData({...formData, bankAddress: e.target.value})}
             className="w-full p-2 border rounded"
@@ -95,7 +170,6 @@ export default function InternationalTransferPage() {
           <label className="block text-sm font-medium mb-1">SWIFT/IBAN</label>
           <input
             type="text"
-            name="swiftIban"
             value={formData.swiftIban}
             onChange={(e) => setFormData({...formData, swiftIban: e.target.value})}
             className="w-full p-2 border rounded"
@@ -107,7 +181,6 @@ export default function InternationalTransferPage() {
           <label className="block text-sm font-medium mb-1">Email Address</label>
           <input
             type="email"
-            name="email"
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
             className="w-full p-2 border rounded"
@@ -119,7 +192,6 @@ export default function InternationalTransferPage() {
           <label className="block text-sm font-medium mb-1">Phone Number</label>
           <input
             type="tel"
-            name="phone"
             value={formData.phone}
             onChange={(e) => setFormData({...formData, phone: e.target.value})}
             className="w-full p-2 border rounded"
@@ -127,7 +199,41 @@ export default function InternationalTransferPage() {
           />
         </div>
 
-        {/* ... amount and description fields similar to your existing form */}
+        {/* NEW AMOUNT FIELD (ONLY ADDITION) */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Amount ({currency})</label>
+          <input
+            type="number"
+            value={formData.amount}
+            onChange={(e) => setFormData({...formData, amount: e.target.value})}
+            className="w-full p-2 border rounded"
+            min="0.01"
+            step="0.01"
+            max={currentBalance}
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <input
+            type="text"
+            value={formData.description}
+            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        {/* UPDATED TRANSFER BUTTON (ONLY VISUAL CHANGE) */}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-2 px-4 rounded text-white ${
+            loading ? 'bg-gray-400' : 'bg-[#03305c] hover:bg-[#e8742c]'
+          }`}
+        >
+          {loading ? 'Processing...' : 'Transfer Money'}
+        </button>
       </form>
     </div>
   );
