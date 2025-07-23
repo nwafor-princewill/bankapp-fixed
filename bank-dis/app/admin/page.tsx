@@ -28,7 +28,11 @@ type Transaction = {
   reference: string;
   createdAt: string;
   description: string;
-  userId: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
 };
 
 type ModificationHistory = {
@@ -601,6 +605,7 @@ export default function AdminDashboard() {
               <thead>
                 <tr className="bg-[#03305c] text-white">
                   <th className="py-3 px-4 text-left">Date</th>
+                  <th className="py-3 px-4 text-left">User</th>
                   <th className="py-3 px-4 text-left">Reference</th>
                   <th className="py-3 px-4 text-left">Account</th>
                   <th className="py-3 px-4 text-left">Amount</th>
@@ -612,6 +617,7 @@ export default function AdminDashboard() {
                 {transactions.map((txn) => (
                   <tr key={txn._id} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4">{new Date(txn.createdAt).toLocaleString()}</td>
+                    <td className="py-3 px-4">{txn.userId?.firstName} {txn.userId?.lastName}</td>
                     <td className="py-3 px-4">{txn.reference}</td>
                     <td className="py-3 px-4">{txn.accountNumber}</td>
                     <td className={`py-3 px-4 ${
