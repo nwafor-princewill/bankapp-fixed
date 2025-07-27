@@ -112,8 +112,15 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4">Account Summary</h2>
-      
+      {/* <h2 className="text-xl font-semibold mb-4">Account Summary</h2> */}
+
+      <h2 className="text-xl font-semibold mb-4 flex items-center">
+        Your Account Summary This Month
+        <span className="ml-2 text-gray-400 cursor-help" title="Includes all transactions dated this month">
+          ⓘ
+        </span>
+      </h2>
+
       {summary ? (
         <div className="space-y-4">
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
