@@ -116,9 +116,14 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
 
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         Your Account Summary This Month
-        <span className="ml-2 text-gray-400 cursor-help" title="Includes all transactions dated this month">
+        {/* <span className="ml-2 text-gray-400 cursor-help" title="Includes all transactions dated this month">
           ⓘ
-        </span>
+        </span> */}
+
+        <p className="text-sm text-gray-600">
+          Includes all transactions dated this month
+        </p>
+
       </h2>
 
       {summary ? (
