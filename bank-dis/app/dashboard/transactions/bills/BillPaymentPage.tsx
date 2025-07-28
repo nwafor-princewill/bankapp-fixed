@@ -18,7 +18,7 @@ export default function BillPaymentPage() {
     reference: `BILL-${Date.now()}`
   });
   const [showReceipt, setShowReceipt] = useState(false);
-  const [receiptTransactionId, setReceiptTransactionId] = useState('');
+  const [receiptTransactionRef, setReceiptTransactionRef] = useState('');
 
   // Hardcoded billers from your original code
   const billers = [
@@ -64,8 +64,14 @@ export default function BillPaymentPage() {
     toast.success(`Payment of $${amount.toFixed(2)} to ${selectedBiller.name} was successful!`);
 
     // Add these 2 lines RIGHT HERE:
-    setReceiptTransactionId(data.reference || `BILL-${Date.now()}`);
-    setShowReceipt(true);
+    // setReceiptTransactionId(data.reference || `BILL-${Date.now()}`);
+    // setShowReceipt(true);
+
+     // **THE FIX: Use the 'reference' from the API response.**
+      if (data.reference) {
+        setReceiptTransactionRef(data.reference);
+        setShowReceipt(true);
+      }
     
     // Reset form
     setFormData({
@@ -158,7 +164,7 @@ export default function BillPaymentPage() {
 
       {showReceipt && (
         <Receipt 
-          transactionId={receiptTransactionId}
+          transactionId={receiptTransactionRef}
           onClose={() => setShowReceipt(false)}
         />
       )}

@@ -274,8 +274,9 @@ const TransactionHistory = ({ accountNumber, currency }: { accountNumber: string
 
                       {/* view receipt */}
                     <td className="px-6 py-4 whitespace-nowrap">
+                     {/* **THE FIX: Pass the transaction's REFERENCE, not its ID.** */}
                       <button 
-                        onClick={() => setSelectedTransaction(tx._id)}
+                        onClick={() => setSelectedTransaction(tx.reference)}
                         className="text-blue-600 hover:underline"
                       >
                         View Receipt
