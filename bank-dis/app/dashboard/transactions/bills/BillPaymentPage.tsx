@@ -156,18 +156,12 @@ export default function BillPaymentPage() {
         </button>
       </form>
 
-      return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
-          {/* ... existing JSX ... */}
-          {showReceipt && (
-            <Receipt 
-              transactionId={receiptTransactionId}
-              onClose={() => setShowReceipt(false)}
-            />
-          )}
-        </div>
-      );
-
+      {showReceipt && (
+        <Receipt 
+          transactionId={receiptTransactionId}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
     </div>
   );
 }
