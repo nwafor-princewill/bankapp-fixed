@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiPrinter, FiDownload, FiX } from 'react-icons/fi';
 import CurrencyDisplay from './CurrencyDisplay';
+import jsPDF from 'jspdf';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -46,8 +47,38 @@ export default function Receipt({ transactionId, onClose }: {
   };
 
   const handleDownload = () => {
-    // Implement PDF download functionality
-    alert('PDF download would be implemented here');
+    const doc = new jsPDF();
+    
+    // Set up PDF styling
+    doc.setFontSize(16);
+    doc.text('Transaction Receipt', 20, 20);
+    
+    doc.setFontSize(12);
+    doc.text(`Reference: ${receipt.reference}`, 20, 40);
+    doc.text(`Date: ${new Date(receipt.transactionDate).toLocaleString()}`, 20, 50);
+    doc.text(`Status: ${receipt.status.charAt(0).toUpperCase() + receipt.status.slice(1)}`, 20, 60);
+    
+    doc.text('Transaction Details', 20, 80);
+    doc.text(`Type: ${receipt.type.charAt(0).toUpperCase() + receipt.type.slice(1)}`, 20, 90);
+    doc.text(`Amount: ${receipt.currency} ${receipt.amount.toFixed(2)}`, 20, 100);
+    doc.text(`Description: ${receipt.description}`, 20, 110);
+    
+    let yPos = 120;
+    if (receipt.recipientDetails) {
+      if (receipt.recipientDetails.accountName) {
+        doc.text(`Recipient: ${receipt.recipientDetails.accountName}`, 20, yPos);
+        yPos += 10;
+      }
+      if (receipt.recipientDetails.accountNumber || receipt.recipientAccount) {
+        doc.text(`Account: ${receipt.recipientDetails.accountNumber || receipt.recipientAccount}`, 20, yPos);
+        yPos += 10;
+      }
+    }
+    
+    doc.text(`New Balance: ${receipt.currency} ${receipt.balanceAfter.toFixed(2)}`, 20, yPos + 10);
+    
+    // Download the PDF
+    doc.save(`receipt_${receipt.reference}.pdf`);
   };
 
   if (loading) {
@@ -124,14 +155,18 @@ export default function Receipt({ transactionId, onClose }: {
           </div>
           {receipt.recipientDetails && (
             <>
-              <div className="flex justify-between mb-2">
-                <span>Recipient:</span>
-                <span>{receipt.recipientDetails.accountName}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Account:</span>
-                <span>{receipt.recipientAccount || receipt.recipientDetails.accountNumber}</span>
-              </div>
+              {receipt.recipientDetails.accountName && (
+                <div className="flex justify-between mb-2">
+                  <span>Recipient:</span>
+                  <span>{receipt.recipientDetails.accountName}</span>
+                </div>
+              )}
+              {(receipt.recipientDetails.accountNumber || receipt.recipientAccount) && (
+                <div className="flex justify-between mb-2">
+                  <span>Account:</span>
+                  <span>{receipt.recipientDetails.accountNumber || receipt.recipientAccount}</span>
+                </div>
+              )}
             </>
           )}
         </div>
