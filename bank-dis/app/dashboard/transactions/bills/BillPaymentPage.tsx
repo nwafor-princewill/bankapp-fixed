@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import CurrencyDisplay from '@/app/components/CurrencyDisplay';
+import Receipt from '@/app/components/Receipt';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,6 +17,8 @@ export default function BillPaymentPage() {
     paymentDate: new Date().toISOString().split('T')[0],
     reference: `BILL-${Date.now()}`
   });
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptTransactionId, setReceiptTransactionId] = useState('');
 
   // Hardcoded billers from your original code
   const billers = [
@@ -58,6 +62,10 @@ export default function BillPaymentPage() {
     if (!response.ok) throw new Error(data.message || 'Payment failed');
 
     toast.success(`Payment of $${amount.toFixed(2)} to ${selectedBiller.name} was successful!`);
+
+    // Add these 2 lines RIGHT HERE:
+    setReceiptTransactionId(data.reference || `BILL-${Date.now()}`);
+    setShowReceipt(true);
     
     // Reset form
     setFormData({
@@ -147,6 +155,19 @@ export default function BillPaymentPage() {
           {loading ? 'Processing...' : 'Pay Bill'}
         </button>
       </form>
+
+      return (
+        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
+          {/* ... existing JSX ... */}
+          {showReceipt && (
+            <Receipt 
+              transactionId={receiptTransactionId}
+              onClose={() => setShowReceipt(false)}
+            />
+          )}
+        </div>
+      );
+
     </div>
   );
 }

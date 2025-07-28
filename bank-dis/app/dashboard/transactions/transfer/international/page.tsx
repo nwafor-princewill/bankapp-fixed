@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import CurrencyDisplay from '@/app/components/CurrencyDisplay';
+import Receipt from '@/app/components/Receipt';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,6 +12,9 @@ export default function InternationalTransferPage() {
   const [loading, setLoading] = useState(false);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [currency, setCurrency] = useState<string>('USD');
+   // Receipt state management
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptTransactionId, setReceiptTransactionId] = useState('');
   const [formData, setFormData] = useState({
     accountNumber: '',
     accountName: '',
@@ -119,6 +123,10 @@ export default function InternationalTransferPage() {
       toast.success(`International transfer of ${amount.toFixed(2)} ${currency} initiated successfully!`, {
         autoClose: 5000
       });
+
+      // Add these lines:
+      setReceiptTransactionId(data.reference || `INT-TRX-${Date.now()}`);
+      setShowReceipt(true);
       
       // Update local balance
       setCurrentBalance(prev => prev - amount);
@@ -143,6 +151,8 @@ export default function InternationalTransferPage() {
       setLoading(false);
     }
   };
+
+ 
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
@@ -279,6 +289,13 @@ export default function InternationalTransferPage() {
           {loading ? 'Processing...' : 'Transfer Money'}
         </button>
       </form>
+    {/* Receipt Modal or Section */}
+    {showReceipt && (
+      <Receipt 
+        transactionId={receiptTransactionId}
+        onClose={() => setShowReceipt(false)}
+      />
+    )}
     </div>
   );
 }

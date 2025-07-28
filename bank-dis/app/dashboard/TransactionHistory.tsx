@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { FaFilter, FaExchangeAlt, FaArrowUp, FaArrowDown, FaClock, FaCheck } from 'react-icons/fa';
+import Receipt from '../components/Receipt';
 
 type TransactionType = 'deposit' | 'withdrawal' | 'transfer' | 'payment';
 
@@ -22,6 +23,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const TransactionHistory = ({ accountNumber, currency }: { accountNumber: string; currency: string }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  // const [currentBalance, setCurrentBalance] = useState<number>(0);
+  const [selectedTransaction, setSelectedTransaction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     page: 1,
@@ -116,6 +119,9 @@ const TransactionHistory = ({ accountNumber, currency }: { accountNumber: string
       currency: currency
     }).format(amount);
   };
+
+  // const [transactions, setTransactions] = useState<Transaction[]>([]);
+  // const [loading, setLoading] = useState(true);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
@@ -265,6 +271,16 @@ const TransactionHistory = ({ accountNumber, currency }: { accountNumber: string
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatCurrency(tx.balanceAfter)}
                     </td>
+
+                      {/* view receipt */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button 
+                        onClick={() => setSelectedTransaction(tx._id)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        View Receipt
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -297,6 +313,16 @@ const TransactionHistory = ({ accountNumber, currency }: { accountNumber: string
           </div>
         </>
       )}
+
+
+      {/* select */}
+      {selectedTransaction && (
+        <Receipt 
+          transactionId={selectedTransaction} 
+          onClose={() => setSelectedTransaction(null)} 
+        />
+      )}
+
     </div>
   );
 };

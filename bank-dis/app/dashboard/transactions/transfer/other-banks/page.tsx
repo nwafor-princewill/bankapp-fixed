@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import CurrencyDisplay from '@/app/components/CurrencyDisplay';
+import Receipt from '@/app/components/Receipt';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -66,6 +67,10 @@ export default function TransferPage() {
     fetchBalance();
   }, [router]);
 
+  // is this good here?
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptTransactionId, setReceiptTransactionId] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -104,6 +109,10 @@ export default function TransferPage() {
       toast.success(`Transfer of $${amount.toFixed(2)} completed successfully!`, {
         autoClose: 5000
       });
+
+      // Add these lines:
+      setReceiptTransactionId(data.reference || `TRX-${Date.now()}`);
+      setShowReceipt(true);
       
       // Update local balance
       setCurrentBalance(prev => prev - amount);
@@ -199,6 +208,15 @@ export default function TransferPage() {
           {loading ? 'Processing...' : 'Transfer Money'}
         </button>
       </form>
+
+      {/* Show receipt modal if needed */}
+      {showReceipt && (
+        <Receipt 
+          transactionId={receiptTransactionId}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
+
     </div>
   );
 }
