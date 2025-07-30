@@ -13,6 +13,7 @@ export default function Receipt({ transactionId, onClose }: {
 }) {
   const [receipt, setReceipt] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showDownloadNotification, setShowDownloadNotification] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -47,6 +48,9 @@ export default function Receipt({ transactionId, onClose }: {
   };
 
   const handleDownload = () => {
+    // Show notification
+    setShowDownloadNotification(true);
+    
     const doc = new jsPDF();
     
     // Set up PDF styling
@@ -79,6 +83,11 @@ export default function Receipt({ transactionId, onClose }: {
     
     // Download the PDF
     doc.save(`receipt_${receipt.reference}.pdf`);
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+      setShowDownloadNotification(false);
+    }, 3000);
   };
 
   if (loading) {
@@ -110,6 +119,13 @@ export default function Receipt({ transactionId, onClose }: {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        {/* Download Notification */}
+        {showDownloadNotification && (
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-60">
+            ✓ Receipt downloaded successfully!
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Transaction Receipt</h2>
           <button 
