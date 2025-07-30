@@ -51,7 +51,7 @@ export default function Receipt({ transactionId, onClose }: {
     
     // Set up PDF styling
     doc.setFontSize(16);
-    doc.text('Transaction Receipt', 20, 20);
+    doc.text('Transaction Receipt', 20, 20)
     
     doc.setFontSize(12);
     doc.text(`Reference: ${receipt.reference}`, 20, 40);

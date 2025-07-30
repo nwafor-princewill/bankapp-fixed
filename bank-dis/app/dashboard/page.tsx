@@ -121,7 +121,7 @@ const DashboardPage = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Desktop: Top row with AccountSummary and QuickActions */}
           <div className="hidden lg:grid lg:grid-cols-2 gap-6">
-            <AccountSummary accountNumber={primaryAccount.accountNumber} />
+            {/* <AccountSummary accountNumber={primaryAccount.accountNumber} /> */}
             <QuickActions accountNumber={primaryAccount.accountNumber} />
           </div>
           
@@ -145,7 +145,7 @@ const DashboardPage = () => {
         
         {/* Mobile Order #3: AccountSummary (shown only on mobile) */}
         <div className="lg:hidden">
-          <AccountSummary accountNumber={primaryAccount.accountNumber} />
+          {/* <AccountSummary accountNumber={primaryAccount.accountNumber} /> */}
         </div>
 
         {/* Mobile Order #4: TransactionHistory (shown only on mobile) */}

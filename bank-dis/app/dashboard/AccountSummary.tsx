@@ -182,14 +182,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({ accountNumber }) => {
                 showMinusSign
               />
             </div>
-            {/* <div className="bg-gray-50 p-2 rounded">
-              <p className="text-gray-500">Last Activity</p>
-              <p className="font-medium">
-                {summary.lastTransactionDate ? 
-                  new Date(summary.lastTransactionDate).toLocaleDateString() : 
-                  'No activity yet'}
-              </p>
-            </div> */}
+           
           </div>
         </div>
       ) : (
