@@ -23,7 +23,7 @@ export default function RequestLoanForm() {
     try {
       const token = localStorage.getItem('token'); // Adjust based on how you store auth token
       
-      const response = await fetch('/api/loans/apply', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/loans/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
