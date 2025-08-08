@@ -4,6 +4,7 @@ import { ImCancelCircle } from 'react-icons/im';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+/* import { usePin } from '@/app/contexts/PinContext'; */
 
 interface AuthModalsProps {
   showLogin: boolean;
@@ -14,11 +15,8 @@ interface AuthModalsProps {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Supported currencies
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY','INR', 'KRW', 'BRL', 'MXN', 'SGD', 'HKD', 'SEK', 'NOK', 
-  'ZAR', 'RUB', 'TRY', 'NGN'] as const;
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'KRW', 'BRL', 'MXN', 'SGD', 'HKD', 'SEK', 'NOK', 'ZAR', 'RUB', 'TRY', 'NGN'] as const;
 
-// Security questions
 const SECURITY_QUESTIONS = [
   "What was your first pet's name?",
   "What city were you born in?",
@@ -33,8 +31,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   onClose,
   defaultTab = 'login'
 }) => {
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>(defaultTab);
   const router = useRouter();
+  /* const { checkPinStatus } = usePin(); */
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>(defaultTab);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -68,7 +67,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const [newPassword, setNewPassword] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  // Set the active tab based on which modal is shown
   useEffect(() => {
     if (showSignup) {
       setActiveTab('signup');
@@ -77,7 +75,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     }
   }, [showLogin, showSignup]);
 
-  // Check for reset token in URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -88,29 +85,23 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     }
   }, []);
 
-  // Email validation function
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Enhanced email validation with common domain suggestions
   const validateEmailWithSuggestions = (email: string): { isValid: boolean; message?: string } => {
     if (!email) {
       return { isValid: false, message: 'Email is required' };
     }
     
     if (!validateEmail(email)) {
-      // Check if it's missing @ symbol
       if (!email.includes('@')) {
         return { isValid: false, message: 'Email must contain @ symbol (e.g., user@gmail.com)' };
       }
-      
-      // Check if it's missing domain extension
       if (!email.includes('.') || email.split('@')[1]?.split('.').length < 2) {
         return { isValid: false, message: 'Email must include domain extension (e.g., user@gmail.com)' };
       }
-      
       return { isValid: false, message: 'Please enter a valid email address (e.g., user@gmail.com)' };
     }
     
@@ -123,8 +114,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       ...prev,
       [name]: value,
     }));
-    
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -151,8 +140,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       ...prev,
       [name]: value,
     }));
-    
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -160,7 +147,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     e.preventDefault();
     setError('');
     
-    // Validate email format
     const emailValidation = validateEmailWithSuggestions(loginData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
@@ -182,15 +168,18 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       const data = await response.json();
       
       if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('Your account has been blocked. Please contact support.');
-        }
+        // if (response.status === 403) {
+        //   throw new Error('Your account has been blocked. Please contact support.');
+        // }
         throw new Error(data.message || 'Login failed');
       }
 
+      //change for login
       localStorage.setItem('token', data.token);
+      // document.cookie = `token=${data.token}; path=/; max-age=2592000; SameSite=Lax; Secure`;
       localStorage.setItem('user', JSON.stringify(data.user));
       
+      /* await checkPinStatus(); */
       onClose();
       router.push('/dashboard');
     } catch (err) {
@@ -203,7 +192,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     e.preventDefault();
     setError('');
 
-    // Add this validation
     const incompleteQuestions = formData.securityQuestions.some(
       q => !q.question.trim() || !q.answer.trim()
     );
@@ -213,14 +201,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       return;
     }
     
-    // Validate email format
     const emailValidation = validateEmailWithSuggestions(formData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
       return;
     }
     
-    // Additional validation
     if (!formData.firstName.trim()) {
       setError('First name is required');
       return;
@@ -266,7 +252,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       return;
     }
 
-    // Validate security questions
     for (let i = 0; i < formData.securityQuestions.length; i++) {
       const question = formData.securityQuestions[i];
       if (!question.question || !question.answer) {
@@ -304,9 +289,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         throw new Error(data.message || 'Registration failed');
       }
 
+      //change for signup
       localStorage.setItem('token', data.token);
+      // document.cookie = `token=${data.token}; path=/; max-age=2592000; SameSite=Lax; Secure`;
       localStorage.setItem('user', JSON.stringify(data.user));
       
+      /* await checkPinStatus(); */
       onClose();
       router.push('/dashboard');
     } catch (err) {
@@ -344,38 +332,38 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    setError('');
-    const response = await fetch(`${API_URL}/api/auth/reset-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        token: resetToken,
-        newPassword
-      }),
-    });
+    e.preventDefault();
+    try {
+      setError('');
+      const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token: resetToken,
+          newPassword
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to reset password');
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reset password');
+      }
+
+      setResetSuccess(true);
+      setTimeout(() => {
+        setShowResetPassword(false);
+        setResetSuccess(false);
+        onClose();
+        router.replace('/');
+      }, 2000);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reset password');
     }
-
-    setResetSuccess(true);
-    setTimeout(() => {
-      setShowResetPassword(false);
-      setResetSuccess(false);
-      onClose();
-      router.replace('/'); // Use router.replace to clear query parameters
-    }, 2000);
-    
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Failed to reset password');
-  }
-};
+  };
 
   if (!showLogin && !showSignup) return null;
 

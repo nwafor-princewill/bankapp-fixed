@@ -4,7 +4,7 @@ export default function BusinessGuidePage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Small Business Banking Guide</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          This comprehensive guide covers all aspects of Amalgamated Bank's small 
+          This comprehensive guide covers all aspects of ZenaTrust Bank's small 
           business banking services, from account setup to advanced cash management.
         </p>
         

@@ -48,7 +48,7 @@ const features: FeatureItem[] = [
     description: 'A safe and quick way to receive or transfer funds to another institution located in the United States.',
     points: [
       'Wire/Book Transfer',
-      'Internal Funds Transfer - Enables the electronic transfer of funds between Amalgamated Bank accounts.',
+      'Internal Funds Transfer - Enables the electronic transfer of funds between ZenaTrust Bank accounts.',
       'Fraud Prevention - Safeguard your account when you use Check Positive Pay or ACH Positive Pay to quickly and efficiently detect fraudulent activity.'
     ]
   },

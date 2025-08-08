@@ -108,7 +108,7 @@ const YourMoney: React.FC = () => {
     },
     {
       tag: "Small Business",
-      title: "Amalgamated Business Checking Plus",
+      title: "ZenaTrust Business Checking Plus",
       description: "A flexible account for growing businesses and organizations with transaction volume and cash management needs.",
       // primaryButtonText: "Email Us",
       highlightValue: "$0",

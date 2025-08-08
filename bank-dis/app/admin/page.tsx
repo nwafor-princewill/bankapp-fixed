@@ -302,6 +302,34 @@ export default function AdminDashboard() {
     }
   };
 
+  // Add this with your other functions, probably around line 200-300 in your file
+  const deleteTransaction = async (transactionId: string) => {
+    if (!confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/admin/delete-transaction/${transactionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toast.success(data.message);
+        fetchTransactions(Date.now()); // Refresh transactions with cache buster
+      } else {
+        throw new Error(data.message || 'Failed to delete transaction');
+      }
+    } catch (err) {
+      console.error('Delete transaction failed:', err);
+      toast.error(err instanceof Error ? err.message : 'Operation failed');
+    }
+  };
+
   const handleBackdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -626,6 +654,8 @@ export default function AdminDashboard() {
                       ${Math.abs(txn.amount).toFixed(2)}
                     </td>
                     <td className="py-3 px-4 capitalize">{txn.type}</td>
+                    
+                    {/* ADD/REPLACE THIS CELL WITH YOUR CODE */}
                     <td className="py-3 px-4 flex">
                       <button
                         onClick={() => {
@@ -645,9 +675,16 @@ export default function AdminDashboard() {
                       >
                         <FiClock size={18} />
                       </button>
+                      <button
+                        onClick={() => deleteTransaction(txn._id)}
+                        className="text-red-500 hover:text-red-700 ml-2 p-1"
+                        title="Delete transaction"
+                      >
+                        <FiX size={18} />
+                      </button>
                     </td>
                   </tr>
-                ))}
+                ))} 
               </tbody>
             </table>
           </div>

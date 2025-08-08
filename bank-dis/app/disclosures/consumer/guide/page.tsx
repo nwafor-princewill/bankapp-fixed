@@ -4,7 +4,7 @@ export default function ConsumerGuidePage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Consumer Account Guide</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          This guide provides detailed information about managing your Amalgamated 
+          This guide provides detailed information about managing your ZenaTrust 
           Bank consumer accounts, including checking, savings, and loan products.
         </p>
         

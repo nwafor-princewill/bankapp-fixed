@@ -16,7 +16,7 @@ const BusinessBankingTools = () => {
       <div className="grid md:grid-cols-3 gap-8 mb-16">
         {/* Business Checking Plus */}
         <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-xl font-bold text-[#03305c] mb-4">Amalgamated Business Checking Plus</h3>
+          <h3 className="text-xl font-bold text-[#03305c] mb-4">ZenaTrust Business Checking Plus</h3>
           <p className="text-[#03305c] mb-6">
             A checking account designed for growing business, with ultra-connected everyday banking and easy cashflow and transaction management.
           </p>
@@ -33,7 +33,7 @@ const BusinessBankingTools = () => {
 
         {/* Business Checking */}
         <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-xl font-bold text-[#03305c] mb-4">Amalgamated Business Checking</h3>
+          <h3 className="text-xl font-bold text-[#03305c] mb-4">ZenaTrust Business Checking</h3>
           <p className="text-[#03305c] mb-6">
             Essential checking with 10 monthly maintenance and limited transactions for your business or organization's everyday needs.
           </p>
@@ -70,7 +70,7 @@ const BusinessBankingTools = () => {
         <div className="bg-[#f5f5f5] p-8 rounded-lg">
           <h3 className="text-2xl font-bold text-[#e8742c] mb-4">Learn about our mission</h3>
           <p className="text-[#03305c]">
-            Amalgamated Bank is for those who want the power to make more impact by using the financial system to advance social goals. 
+            ZenaTrust Bank is for those who want the power to make more impact by using the financial system to advance social goals. 
             We are committed to ensuring your personal prosperity leads to collective prosperity for all of us and our planet.
           </p>
         </div>

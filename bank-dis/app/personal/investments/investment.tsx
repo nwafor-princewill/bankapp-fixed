@@ -157,7 +157,7 @@ const Investment = () => {
             <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
               <h2 className="text-2xl font-bold text-[#03305c] mb-6">Make informed decisions</h2>
               <p className="text-gray-700 mb-6">
-                An Amalgamated Bank Representative will work with you to <strong>assess</strong> your unique situation and point you toward 
+                An ZenaTrust Bank Representative will work with you to <strong>assess</strong> your unique situation and point you toward 
                 investments with objectives that reflect your financial goals.
               </p>
               <div className="bg-gray-50 p-6 rounded-lg">
@@ -225,7 +225,7 @@ const Investment = () => {
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-[#e8742c] rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-gray-700">
-                    Through Amalgamated Bank, we offer access to a range of investment options that reflect our 
+                    Through ZenaTrust Bank, we offer access to a range of investment options that reflect our 
                     conservative philosophy
                   </span>
                 </div>
@@ -286,7 +286,7 @@ const Investment = () => {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                Contact an Amalgamated Bank Institutional Representative
+                Contact an ZenaTrust Bank Institutional Representative
               </p>
               <button className="w-full bg-[#e8742c] text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
                 Contact us
@@ -367,7 +367,7 @@ const Investment = () => {
                 <span className="text-xl font-light">bank</span>
               </div>
               <p className="text-gray-300 mb-4">
-                Amalgamated Bank is committed to providing exceptional investment services to help you achieve your financial goals.
+                ZenaTrust Bank is committed to providing exceptional investment services to help you achieve your financial goals.
               </p>
             </div>
             <div>
@@ -399,7 +399,7 @@ const Investment = () => {
             </div>
           </div>
           <div className="border-t border-gray-600 mt-8 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 Amalgamated Bank. All rights reserved.</p>
+            <p>&copy; 2024 ZenaTrust Bank. All rights reserved.</p>
             <p className="mt-2">Investment products are not FDIC insured, may lose value, and are not bank guaranteed.</p>
           </div>
         </div>

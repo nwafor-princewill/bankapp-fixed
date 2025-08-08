@@ -21,7 +21,7 @@ const CreditCards = () => {
     {
       icon: <DollarSign className="w-8 h-8 text-blue-600" />,
       title: "Transfer funds easily",
-      description: "Transfer money with ease through Online Banking. Move money between your Amalgamated Bank accounts as well as accounts held at other U.S. institutions. You can also schedule transfers or funds automatically from your existing checking account."
+      description: "Transfer money with ease through Online Banking. Move money between your ZenaTrust Bank accounts as well as accounts held at other U.S. institutions. You can also schedule transfers or funds automatically from your existing checking account."
     },
     {
       icon: <Smartphone className="w-8 h-8 text-blue-600" />,
@@ -32,17 +32,17 @@ const CreditCards = () => {
 
   const cardTypes = [
     {
-      name: "Amalgamated Rewards Card",
+      name: "ZenaTrust Rewards Card",
       benefits: ["Earn 2% cash back on all purchases", "No annual fee", "0% introductory APR for 12 months"],
       color: "bg-gradient-to-r from-blue-600 to-blue-800"
     },
     {
-      name: "Amalgamated Premium Card",
+      name: "ZenaTrust Premium Card",
       benefits: ["3x points on travel and dining", "Premium travel insurance", "Airport lounge access"],
       color: "bg-gradient-to-r from-gray-700 to-gray-900"
     },
     {
-      name: "Amalgamated Business Card",
+      name: "ZenaTrust Business Card",
       benefits: ["1.5% cash back on business purchases", "No foreign transaction fees", "Expense management tools"],
       color: "bg-gradient-to-r from-green-600 to-green-800"
     }
@@ -74,7 +74,7 @@ const CreditCards = () => {
                     <div className={`${card.color} h-32 flex items-center justify-center`}>
                       <div className="text-white text-center">
                         <CreditCard className="w-8 h-8 mx-auto mb-2" />
-                        <span className="text-sm font-medium">Amalgamated Bank</span>
+                        <span className="text-sm font-medium">ZenaTrust Bank</span>
                       </div>
                     </div>
                     <div className="p-6">

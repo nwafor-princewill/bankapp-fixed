@@ -1,6 +1,8 @@
 import React from 'react';
 import smiling from '@/public/images/working-girlie.jpg';
 import bush from '@/public/images/push-shii.jpg';
+import ban from '@/public/images/bank-2.jpg';
+import ba from '@/public/images/bank-3.jpg';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import Image from 'next/image';
 
@@ -16,7 +18,7 @@ const Performance = () => {
           <div className="relative group flex-1">
             <div className="relative h-[25rem] w-full overflow-hidden">
               <Image
-                src={smiling}
+                src={ban}
                 alt="Happy team working"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 placeholder="blur"
@@ -37,7 +39,7 @@ const Performance = () => {
           <div className="relative group flex-1">
             <div className="relative h-[25rem] w-full overflow-hidden">
               <Image
-                src={bush}
+                src={ba}
                 alt="Team achieving goals"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 placeholder="blur"

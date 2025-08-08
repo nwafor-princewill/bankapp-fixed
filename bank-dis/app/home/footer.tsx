@@ -11,8 +11,8 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <Image
-              src="/images/amalg-logo.jpg"
-              alt="Amalgamated Bank Logo"
+              src="/images/project-logo4.png"
+              alt="ZenaTrust Bank Logo"
               width={120}
               height={40}
               className="h-10 w-auto"
@@ -21,7 +21,7 @@ const Footer = () => {
           <div className="w-full md:w-auto">
             <h3 className="text-lg font-semibold mb-2">Stay updated</h3>
             <p className="text-sm mb-4">
-              Get Amalgamated Bank to your inbox. Unsubscribe any time.
+              Get ZenaTrust Bank to your inbox. Unsubscribe any time.
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <input
@@ -43,8 +43,8 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div className="mb-4 md:mb-0">
             <Image
-              src="/images/amalg-logo.jpg"
-              alt="Amalgamated Bank Logo"
+              src="/images/project-logo4.png"
+              alt="ZenaTrust Bank Logo"
               width={120}
               height={40}
               className="h-10 w-auto mb-2"
@@ -52,7 +52,7 @@ const Footer = () => {
             <p className="text-sm">
               Member FDIC | Equal Housing and Equal Opportunity Lender
             </p>
-            <p className="text-sm">Amalgamated Bank NMLS ID# 898791</p>
+            <p className="text-sm">ZenaTrust Bank NMLS ID# 898791</p>
           </div>
           <div className="text-sm">
             <p>
@@ -69,17 +69,17 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="text-sm">
             <h4 className="font-semibold text-[#e8742c] mb-2">Manchester</h4>
-            <p>Amalgamated Bank</p>
+            <p>ZenaTrust Bank</p>
             <p>Manchester, United Kingdom</p>
           </div>
           <div className="text-sm">
             <h4 className="font-semibold text-[#e8742c] mb-2">Brooklyn</h4>
-            <p>Amalgamated Bank</p>
+            <p>ZenaTrust Bank</p>
             <p>Glasgow, United Kingdom</p>
           </div>
           <div className="text-sm">
             <h4 className="font-semibold text-[#e8742c] mb-2">Bronx</h4>
-            <p>Amalgamated Bank</p>
+            <p>ZenaTrust Bank</p>
             <p>Bristol, United Kingdom</p>
             <p className="mt-2">
               Phone: <a href="tel:+44-7469-549275" className="text-[#e8742c] hover:underline">+44-7469-549275</a>
@@ -151,13 +151,13 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center pt-4 border-t border-gray-300">
           <div className="mb-4 md:mb-0">
             <Image
-              src="/images/amalg-logo.jpg"
-              alt="Amalgamated Bank Logo"
+              src="/images/project-logo4.png"
+              alt="ZenaTrust Bank Logo"
               width={120}
               height={40}
               className="h-10 w-auto"
             />
-            <p className="text-xs mt-1">© {new Date().getFullYear()} Amalgamated Bank. All rights reserved.</p>
+            <p className="text-xs mt-1">© {new Date().getFullYear()} ZenaTrust Bank. All rights reserved.</p>
           </div>
           <div className="flex space-x-4">
             <a href="#" className="text-white hover:text-[#e8742c] transition-colors">

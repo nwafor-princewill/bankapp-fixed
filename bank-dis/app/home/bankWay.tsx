@@ -5,7 +5,7 @@ const BankWay = () => {
     <div className="py-6 px-4 sm:px-6 lg:px-8">
                   <hr className="border-t-1  mx-auto" />
 
-      <div className="mx-auto pt-7 flex flex-col justify-start">
+      <div className="mx-auto pt-7 flex flex-col justify-start items-center max-w-7xl">
         <div className="text-start mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#03305c] mb-6">
             Tools to help you bank your way

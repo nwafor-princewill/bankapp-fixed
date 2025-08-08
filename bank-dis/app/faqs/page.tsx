@@ -16,7 +16,7 @@ const FAQPage = () => {
       icon: <FaShieldAlt className="text-2xl text-[#e8742c]" />,
       questions: [
         {
-          question: "How does Amalgamated Bank protect my account?",
+          question: "How does ZenaTrust Bank protect my account?",
           answer: "We use multi-layered security including encryption, fraud monitoring, and secure login with multi-factor authentication to protect your accounts 24/7."
         },
         {
@@ -72,7 +72,7 @@ const FAQPage = () => {
       icon: <FaQuestionCircle className="text-2xl text-[#e8742c]" />,
       questions: [
         {
-          question: "What makes Amalgamated Bank different?",
+          question: "What makes ZenaTrust Bank different?",
           answer: "As America's socially responsible bank, we align our services with your values—investing in communities and refusing to support harmful industries."
         },
         {
@@ -86,7 +86,7 @@ const FAQPage = () => {
       icon: <FaUserShield className="text-2xl text-[#e8742c]" />,
       questions: [
         {
-          question: "How does Amalgamated protect my personal information?",
+          question: "How does ZenaTrust protect my personal information?",
           answer: "We follow strict privacy policies, use advanced encryption, and never sell your data. You control how your information is used and shared."
         },
         {
@@ -104,7 +104,7 @@ const FAQPage = () => {
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-[#03305c] mb-6">FAQs</h1>
           <p className="text-xl text-[#03305c] max-w-3xl mx-auto">
-            At Amalgamated, the safety and security of your account(s) is our top priority. Browse the topics below to learn more about how we protect your personal information and finances.
+            At ZenaTrust, the safety and security of your account(s) is our top priority. Browse the topics below to learn more about how we protect your personal information and finances.
           </p>
         </div>
 

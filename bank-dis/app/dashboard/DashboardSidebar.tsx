@@ -1,16 +1,19 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiSettings, FiHelpCircle, FiShield, FiExternalLink, FiMenu, FiX, FiHome } from 'react-icons/fi';
 import { MdAccountBalance, MdPayment, MdReceipt, MdPeople, MdBuild, MdCreditCard } from 'react-icons/md';
 import { FaMoneyBillWave, FaPiggyBank } from 'react-icons/fa';
 import { MdSettingsApplications } from 'react-icons/md';
+/* import TransferPinModal from '@/app/components/TransferPinModal'; */
+/* import { usePin } from '@/app/contexts/PinContext'; */
+import { toast } from 'react-toastify';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const menuItems = [
-  // The path for the main dashboard is now correct.
   { id: 'dashboard', label: 'Dashboard', icon: <FiHome size={20} />, path: '/dashboard' },
-  // I've updated the paths below to match your complex href logic for consistency.
   { id: 'transfers', label: 'Transfers', icon: <MdPayment size={20} />, path: '/dashboard/transactions/transfer',
    subItems: [
       { id: 'internal-transfer', label: 'Internal Transfer', path: '/dashboard/transactions/transfer/internal' },
@@ -26,11 +29,6 @@ const menuItems = [
   { id: 'service-requests', label: 'Service Requests', icon: <MdBuild size={20} />, path: '/dashboard/service-requests' },
 ];
 
-const settingsItems = [
-  { id: 'settings/login-security', label: 'Login & Security', icon: <FiShield size={18} />, path: '/dashboard/settings/login-security' },
-  { id: 'settings/notifications', label: 'Notifications & Alerts', icon: <FiSettings size={18} />, path: '/dashboard/settings/notifications' },
-];
-
 const DashboardSidebar = () => {
   const pathname = usePathname();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -39,6 +37,29 @@ const DashboardSidebar = () => {
     help: true,
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  /* const [showPinModal, setShowPinModal] = useState(false); */
+  /* const [hasTransferPin, setHasTransferPin] = useState(false); */
+  /* const { hasPin, showPinModal, setShowPinModal, handleSetPin } = usePin(); */
+
+  type SettingsItem = {
+    id: string;
+    label: string;
+    icon: React.ReactElement;
+    path: string;
+    onClick?: () => void;
+  };
+
+  const settingsItems: SettingsItem[] = [
+    { id: 'settings/login-security', label: 'Login & Security', icon: <FiShield size={18} />, path: '/dashboard/settings/login-security' },
+    { id: 'settings/notifications', label: 'Notifications & Alerts', icon: <FiSettings size={18} />, path: '/dashboard/settings/notifications' },
+    /* {
+      id: 'settings/transfer-pin',
+      label: 'Transfer PIN',
+      icon: <MdCreditCard size={18} />,
+      path: '#',
+      onClick: () => setShowPinModal(true)
+    }, */
+  ];
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -56,13 +77,56 @@ const DashboardSidebar = () => {
   };
 
   const handleLogout = () => {
-  if (confirm('Are you sure you want to logout?')) {
-    // Clear user token from localStorage
-    localStorage.removeItem('token');
-    // Redirect to home page
-    window.location.href = '/';
-  }
-};
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('token');
+      window.location.href = '/';
+    }
+  };
+
+  /* useEffect(() => {
+    const checkPinStatus = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/api/users/pin-status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setHasTransferPin(data.hasPin);
+        }
+      } catch (error) {
+        console.error('Error checking PIN status:', error);
+      }
+    };
+    
+    checkPinStatus();
+  }, []); */
+
+  /* const handleSetPin = async (pin: string): Promise<void> => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/users/set-pin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ pin })
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to set PIN');
+      }
+      
+      setHasTransferPin(true);
+      toast.success('Transfer PIN set successfully');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to set PIN');
+      throw error;
+    }
+  }; */
 
   return (
     <>
@@ -92,7 +156,7 @@ const DashboardSidebar = () => {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-4 flex items-center justify-center border-b border-[#1e4770] h-16">
-          <h1 className="text-xl font-bold">Amalgamated Bank</h1>
+          <h1 className="text-xl font-bold">ZenaTrust Bank</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -100,7 +164,6 @@ const DashboardSidebar = () => {
           <nav className="p-4">
             <ul className="space-y-1">
               {menuItems.map(item => {
-                // **THE FIX for highlighting:** This logic now correctly identifies the active page.
                 const isActive = item.id === 'dashboard'
                   ? pathname === item.path
                   : pathname.startsWith(item.path);
@@ -108,7 +171,6 @@ const DashboardSidebar = () => {
                 return (
                   <li key={item.id}>
                     <Link
-                      // **THE FIX for the URL:** We now use the 'path' property from the menuItems array directly.
                       href={item.path}
                       className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
                         isActive ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
@@ -164,16 +226,36 @@ const DashboardSidebar = () => {
                   const isActive = pathname.startsWith(item.path);
                   return (
                     <li key={item.id}>
-                      <Link
-                        href={item.path}
-                        className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
-                          isActive ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
-                        }`}
-                        onClick={closeMobileMenu}
-                      >
-                        <span className="mr-3">{item.icon}</span>
-                        {item.label}
-                      </Link>
+                      {item.onClick ? (
+                        <button
+                          onClick={() => {
+                            closeMobileMenu();
+                            item.onClick?.();
+                          }}
+                          className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 w-full text-left ${
+                            isActive ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
+                          }`}
+                        >
+                          <span className="mr-3">{item.icon}</span>
+                          {item.label}
+                          {/* {item.id === 'settings/transfer-pin' && (
+                            <span className="ml-auto text-xs">
+                              {hasPin ? '✔️' : '⚠️'}
+                            </span>
+                          )} */}
+                        </button>
+                      ) : (
+                        <Link
+                          href={item.path}
+                          className={`flex items-center px-3 py-2 rounded-md transition-colors duration-200 ${
+                            isActive ? 'bg-[#e8742c]' : 'hover:bg-[#1e4770]'
+                          }`}
+                          onClick={closeMobileMenu}
+                        >
+                          <span className="mr-3">{item.icon}</span>
+                          {item.label}
+                        </Link>
+                      )}
                     </li>
                   );
                 })}
@@ -216,7 +298,7 @@ const DashboardSidebar = () => {
             )}
           </div>
 
-          {/* Logout Button - Added at the bottom of the sidebar */}
+          {/* Logout Button */}
           <div className="mt-auto p-4 border-t border-[#1e4770]">
             <button
               onClick={handleLogout}
@@ -226,9 +308,13 @@ const DashboardSidebar = () => {
               Logout
             </button>
           </div>
-          
         </div>
       </div>
+      {/* <TransferPinModal 
+        isOpen={showPinModal}
+        onClose={() => setShowPinModal(false)}
+        onSetPin={handleSetPin}
+      /> */}
     </>
   );
 };

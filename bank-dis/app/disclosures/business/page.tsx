@@ -4,7 +4,7 @@ export default function BusinessDisclosuresPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Small Business Account Disclosures</h1>
       <div className="space-y-4 text-gray-700">
         <p>
-          Important disclosures for Amalgamated Bank small business account holders.
+          Important disclosures for ZenaTrust Bank small business account holders.
         </p>
         <p>
           These disclosures outline the terms specific to business banking services.

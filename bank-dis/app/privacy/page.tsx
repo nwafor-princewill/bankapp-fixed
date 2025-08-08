@@ -4,7 +4,7 @@ export default function PrivacyPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Privacy Policy</h1>
       <div className="space-y-4 text-gray-700">
         <p>
-          Amalgamated Bank is committed to protecting your privacy and personal information.
+          ZenaTrust Bank is committed to protecting your privacy and personal information.
         </p>
         <p>
           We collect only necessary information to provide our services and maintain your accounts.

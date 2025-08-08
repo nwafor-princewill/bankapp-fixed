@@ -1,5 +1,6 @@
 import React from 'react';
 import MainImg from '@/public/images/homepage.jpg';
+import Main from '@/public/images/bank-6.jpg';
 
 const MainCont = () => {
   return (
@@ -14,7 +15,7 @@ const MainCont = () => {
             rgba(31, 70, 108, 0.3) 65%,
             transparent 75%
           ),
-          url(${MainImg.src})
+          url(${Main.src})
         `,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -28,7 +29,7 @@ const MainCont = () => {
           Bank on Impact
         </h1>
         <p className='text-base md:text-lg pt-6 md:pt-8 font-medium text-white max-w-[600px]'>
-          At Amalgamated Bank, your deposits yield more than interest — they yield change. 
+          At ZenaTrust Bank, your deposits yield more than interest — they yield change. 
           Banking with us means financing a cleaner, better world.
         </p>
       </div>

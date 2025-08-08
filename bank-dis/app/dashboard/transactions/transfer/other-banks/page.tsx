@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import CurrencyDisplay from '@/app/components/CurrencyDisplay';
 import Receipt from '@/app/components/Receipt';
+import OtpModal from '@/app/components/OtpModal';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -12,18 +13,27 @@ export default function TransferPage() {
   const [loading, setLoading] = useState(false);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [currency, setCurrency] = useState<string>('USD');
-  
-  // **FIX 1: Add new fields to the form state**
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptTransactionId, setReceiptTransactionId] = useState('');
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [pendingTransfer, setPendingTransfer] = useState<{
+    amount: number;
+    description: string;
+    bankName: string;
+    toAccount: string;
+    accountName: string;
+    swiftIban: string;
+  } | null>(null);
+
   const [formData, setFormData] = useState({
     bankName: '',
     toAccount: '',
-    accountName: '', // New field for recipient's name
-    swiftIban: '',   // New field for SWIFT/IBAN
+    accountName: '',
+    swiftIban: '',
     amount: '',
     description: 'Fund Transfer'
   });
 
-  // Fetch user balance on component mount
   useEffect(() => {
     const fetchBalance = async () => {
       try {
@@ -32,23 +42,16 @@ export default function TransferPage() {
           router.push('/login');
           return;
         }
-
         const response = await fetch(`${API_URL}/api/accounts/primary`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
-
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.message || 'Failed to fetch balance');
         }
-
         const data = await response.json();
-        const balance = data.balance ?? 0;
-        const currency = data.currency ?? 'USD';
-        setCurrentBalance(balance);
-        setCurrency(currency);
+        setCurrentBalance(data.balance ?? 0);
+        setCurrency(data.currency ?? 'USD');
       } catch (error) {
         console.error('Error fetching balance:', error);
         toast.error('Failed to load account balance.');
@@ -56,71 +59,121 @@ export default function TransferPage() {
         setCurrency('USD');
       }
     };
-
     fetchBalance();
   }, [router]);
 
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [receiptTransactionId, setReceiptTransactionId] = useState('');
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
       toast.error('Please enter a valid amount');
       return;
     }
-    
     if (amount > currentBalance) {
       toast.error('Insufficient funds for this transfer');
       return;
     }
-
+    setPendingTransfer({
+      amount,
+      description: formData.description,
+      bankName: formData.bankName,
+      toAccount: formData.toAccount,
+      accountName: formData.accountName,
+      swiftIban: formData.swiftIban
+    });
     setLoading(true);
-
     try {
       const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/transfers/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          amount,
+          description: formData.description,
+          bankName: formData.bankName,
+          toAccount: formData.toAccount,
+          accountName: formData.accountName,
+          swiftIban: formData.swiftIban,
+          transferType: 'domestic'
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to initiate transfer.');
+      }
+      toast.success('OTP sent to your registered email.');
+      setShowOtpModal(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to initiate transfer.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (otp: string): Promise<boolean> => {
+    if (!pendingTransfer) return false;
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const executeData = {
+        ...pendingTransfer,
+        otp,
+        transferType: 'domestic'
+      };
       const response = await fetch(`${API_URL}/api/transfers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        // **FIX 2: Send the new fields in the request body**
-        body: JSON.stringify({
-          bankName: formData.bankName,
-          toAccount: formData.toAccount,
-          accountName: formData.accountName,
-          swiftIban: formData.swiftIban,
-          amount: amount,
-          description: formData.description,
-          transferType: 'international' // Assuming this form is for other banks/international
-        })
+        body: JSON.stringify(executeData)
       });
-
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Transfer failed');
-
-      toast.success(`Transfer of ${currency} ${amount.toFixed(2)} completed successfully!`);
-
+      if (!response.ok) {
+        throw new Error(data.message || 'Transfer execution failed.');
+      }
+      toast.success(`Transfer of ${currency} ${pendingTransfer.amount.toFixed(2)} completed successfully!`);
+      setShowOtpModal(false);
       setReceiptTransactionId(data.reference || `TRX-${Date.now()}`);
       setShowReceipt(true);
-      
-      setCurrentBalance(prev => prev - amount);
-      
-      // **FIX 3: Reset the new fields in the form**
-      setFormData({
-        bankName: '',
-        toAccount: '',
-        accountName: '',
-        swiftIban: '',
-        amount: '',
-        description: 'Fund Transfer'
-      });
-      
+      setCurrentBalance(prev => prev - pendingTransfer.amount);
+      setFormData({ bankName: '', toAccount: '', accountName: '', swiftIban: '', amount: '', description: 'Fund Transfer' });
+      setPendingTransfer(null);
+      return true;
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Transfer failed');
+      toast.error(err instanceof Error ? err.message : 'An error occurred.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!pendingTransfer) return;
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/transfers/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...pendingTransfer,
+          transferType: 'domestic'
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to resend OTP.');
+      }
+      toast.success('New OTP sent to your registered email.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to resend OTP.');
     } finally {
       setLoading(false);
     }
@@ -129,7 +182,6 @@ export default function TransferPage() {
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow">
       <h1 className="text-2xl font-bold mb-6 text-[#03305c]">Transfer to Other Banks</h1>
-      
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
         <p className="text-sm text-gray-600">Available Balance</p>
         <CurrencyDisplay 
@@ -138,7 +190,6 @@ export default function TransferPage() {
           className="text-2xl font-bold text-[#03305c]"
         />
       </div>
-      
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Bank Name</label>
@@ -152,8 +203,6 @@ export default function TransferPage() {
             required
           />
         </div>
-
-        {/* **FIX 4: Add the new "Account Name" input field** */}
         <div>
           <label className="block text-sm font-medium mb-1">Recipient's Full Name</label>
           <input
@@ -166,7 +215,6 @@ export default function TransferPage() {
             required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">Recipient's Account Number</label>
           <input
@@ -179,8 +227,6 @@ export default function TransferPage() {
             required
           />
         </div>
-
-        {/* **FIX 5: Add the new "SWIFT/IBAN" input field** */}
         <div>
           <label className="block text-sm font-medium mb-1">SWIFT Code / IBAN</label>
           <input
@@ -193,7 +239,6 @@ export default function TransferPage() {
             required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">Amount ({currency})</label>
           <input
@@ -208,7 +253,6 @@ export default function TransferPage() {
             required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">Description (Optional)</label>
           <input
@@ -219,7 +263,6 @@ export default function TransferPage() {
             className="w-full p-2 border rounded focus:ring-2 focus:ring-[#03305c]"
           />
         </div>
-
         <button
           type="submit"
           disabled={loading}
@@ -227,17 +270,23 @@ export default function TransferPage() {
             loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#03305c] hover:bg-[#e8742c]'
           }`}
         >
-          {loading ? 'Processing...' : 'Transfer Money'}
+          {loading ? 'Processing...' : 'Continue'}
         </button>
       </form>
-
       {showReceipt && (
         <Receipt 
           transactionId={receiptTransactionId}
           onClose={() => setShowReceipt(false)}
         />
       )}
-
+      {showOtpModal && (
+        <OtpModal
+          isOpen={showOtpModal}
+          onClose={() => setShowOtpModal(false)}
+          onVerify={handleVerifyOtp}
+          onResend={handleResendOtp}
+        />
+      )}
     </div>
   );
 }

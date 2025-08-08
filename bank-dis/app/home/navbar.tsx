@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import logo from '@/public/images/logo.svg';
-import Image from 'next/image';
+// import logo from '@/public/images/logo.svg';
+// import plogo from '@/public/images/project-logo4.png';
+// import Image from 'next/image';
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
@@ -47,10 +48,8 @@ const Navbar = () => {
     }
   ];
 
-   const topNavItems = [
+  const topNavItems = [
     { name: 'Contact us', path: '/contact' },
-    // { name: 'Locations', path: '/locations' },
-    // { name: 'Investor Relations', path: '/investor-relations' },
     { name: 'FAQs', path: '/faqs' }
   ];
 
@@ -73,16 +72,21 @@ const Navbar = () => {
 
   return (
     <header className='bg-white shadow-md'>
-        <AuthModals
-          showLogin={showAuthModal && authType === 'login'}
-          showSignup={showAuthModal && authType === 'signup'}
-          onClose={() => setShowAuthModal(false)}
-          defaultTab={authType}
-        />
+      <AuthModals
+        showLogin={showAuthModal && authType === 'login'}
+        showSignup={showAuthModal && authType === 'signup'}
+        onClose={() => setShowAuthModal(false)}
+        defaultTab={authType}
+      />
       {!isMobile && (
         <>
           <nav className='flex cursor-pointer relative items-center p-5 max-w-7xl mx-auto'>
-            <div><Image src={logo} alt='logo' width={180} height={50} /></div>
+            {/* --- LOGO CHANGE FOR DESKTOP --- */}
+            <Link href="/" className="text-2xl font-extrabold text-[#03305c]">
+                ZenaTrust Bank
+            </Link>
+            {/* <div><Image src={plogo} alt='logo' width={180} height={50} /></div> */}
+            
             <div className='mx-[5rem]'>
               <ul className='flex space-x-6'>
                 {topNavItems.map((item, index) => (
@@ -95,10 +99,6 @@ const Navbar = () => {
                     </Link>
                   </li>
                 ))}
-                {/* {['Contact us', 'Locations', 'Investor Relations', 'FAQs'].map((item, index) => (
-                  <li key={index} className='text-[#03305c] font-bold hover:text-[#e8742c] text-sm 
-                  '>{item}</li>
-                ))} */}
                 <div className='flex'>
                   <IoSearch size={24} />
                 </div>
@@ -108,8 +108,8 @@ const Navbar = () => {
             <div className='flex space-x-3 mr-5'>
               <button
                 className='rounded-3xl px-4 py-1 bg-white text-[#03305c] border
-               border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors 
-               text-sm font-bold'
+                border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors 
+                text-sm font-bold'
                 onClick={() => {
                   setAuthType('login');
                   setShowAuthModal(true);
@@ -117,21 +117,16 @@ const Navbar = () => {
               >
                 Login
               </button>
-              {/* <button className='rounded-3xl px-4 py-1 bg-white text-[#03305c] border
-               border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors
-                text-sm font-bold'>
-                Enroll in online banking
-              </button> */}
               <Link href="/online-banking/enrollment">
                 <button className='rounded-3xl px-4 py-1 bg-white text-[#03305c] border
-                          border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors
-                            text-sm font-bold'>
+                                  border-[#03305c] hover:border-[#e8742c] hover:text-[#e8742c] transition-colors
+                                    text-sm font-bold'>
                   Enroll in online banking
                 </button>
               </Link>
               <button
                 className='rounded-2xl px-4 py-1 bg-[#03305c] hover:bg-[#e8742c]
-               text-white transition-colors text-sm font-bold'
+                text-white transition-colors text-sm font-bold'
                 onClick={() => {
                   setAuthType('signup');
                   setShowAuthModal(true);
@@ -187,7 +182,13 @@ const Navbar = () => {
           <button onClick={() => setMenubar(!menubar)}>
             {menubar ? <ImCancelCircle className='text-2xl text-[#03305c]' /> : <GiHamburgerMenu className='text-2xl text-[#03305c]' />}
           </button>
-          <div><Image src={logo} alt='logo' width={120} height={40} /></div>
+          
+          {/* --- LOGO CHANGE FOR MOBILE --- */}
+          <Link href="/" className="text-xl font-extrabold text-[#03305c]">
+            ZenaTrust Bank
+          </Link>
+          {/* <div><Image src={plogo} alt='logo' width={120} height={40} /></div> */}
+
           <button
             className='rounded-3xl px-3 py-1.5 bg-white text-[#03305c] border border-[#03305c] hover:border-[#e8742c] text-sm'
             onClick={() => {
@@ -240,17 +241,6 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-
-          {/* <div className='pt-8'>
-            <ul className='space-y-5'>
-              {['Contact us', 'Locations', 'Investor Relations', 'FAQs'].map((item, index) => (
-                <li key={index} className='text-[#03305c] hover:text-[#e8742c] text-lg font-bold py-1'>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div> */}
-
             <div className='pt-8'>
                 <ul className='space-y-5'>
                   {topNavItems.map((item, index) => (
@@ -264,8 +254,7 @@ const Navbar = () => {
                     </li>
                   ))}
                 </ul>
-          </div>
-
+            </div>
           <IoSearch size={34} />
         </div>
       )}

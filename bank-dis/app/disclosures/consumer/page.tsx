@@ -2,14 +2,14 @@ export default function ConsumerPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-8 text-[#03305c] border-b-2 border-[#e8742c] pb-4">
-        Consumer Banking Services at Amalgamated Bank
+        Consumer Banking Services at ZenaTrust Bank
       </h1>
       
       <div className="space-y-8 text-gray-800 text-lg leading-relaxed">
         <section>
           <h2 className="text-2xl font-semibold mb-4 text-[#03305c]">Personal Checking Accounts</h2>
           <p>
-            Amalgamated Bank offers a range of checking account options designed to meet your individual needs. 
+            ZenaTrust Bank offers a range of checking account options designed to meet your individual needs. 
             Whether you're looking for a basic checking account with no monthly fees or a premium account with 
             enhanced benefits, we have solutions for every stage of your financial journey.
           </p>
@@ -31,7 +31,7 @@ export default function ConsumerPage() {
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="text-xl font-medium text-[#03305c]">Regular Savings</h3>
               <p className="mt-2">
-                Start saving with just $25 and enjoy easy transfers between your Amalgamated Bank accounts.
+                Start saving with just $25 and enjoy easy transfers between your ZenaTrust Bank accounts.
               </p>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -91,7 +91,7 @@ export default function ConsumerPage() {
           <h2 className="text-2xl font-semibold mb-4 text-[#03305c]">Personal Loans & Credit</h2>
           <p>
             Whether you're consolidating debt, making home improvements, or financing a major purchase, 
-            Amalgamated Bank offers competitive rates and flexible terms.
+            ZenaTrust Bank offers competitive rates and flexible terms.
           </p>
           <div className="mt-4 space-y-4">
             <div className="p-4 border-l-4 border-[#e8742c] bg-gray-50">

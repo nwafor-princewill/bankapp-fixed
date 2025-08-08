@@ -4,6 +4,7 @@ import Image from 'next/image';
 import google from '@/public/images/google play.png';
 import apple from '@/public/images/apple.png';
 import molo from '@/public/images/molo-call.jpg';
+import bank from '@/public/images/bank-5.jpg';
 
 const SecureBank = () => {
   const features = [
@@ -30,7 +31,7 @@ const SecureBank = () => {
         <main className='flex flex-col-reverse md:flex-col lg:flex-row justify-between items-center gap-8 md:gap-12'>
           <div className='w-full max-w-xl order-2 lg:order-1'>
             <h2 className='text-xl sm:text-2xl font-semibold text-[#03305c] mb-4 md:mb-6'>
-              Manage your accounts on the go with Amalgamated Bank's mobile app
+              Manage your accounts on the go with ZenaTrust Bank's mobile app
             </h2>
             
             <ul className='space-y-2 sm:space-y-3 mb-6 md:mb-8'>
@@ -50,6 +51,7 @@ const SecureBank = () => {
               <a href="#" className='transition-transform hover:scale-105'>
                 <Image 
                   src={google} 
+                    // src={bank}  
                   alt='Download on Google Play' 
                   className='h-10 sm:h-12 w-auto'
                   priority
@@ -69,7 +71,7 @@ const SecureBank = () => {
           <div className='w-full flex justify-center mb-6 md:mb-0 order-1 lg:order-2'>
             <div className='relative w-full overflow-hidden shadow-lg'>
               <Image 
-                src={molo} 
+                src={bank} 
                 alt='Mobile banking app screenshot' 
                 className='w-full h-auto sm:h-[32rem] object-cover'
                 priority

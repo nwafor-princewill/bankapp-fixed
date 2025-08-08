@@ -4,7 +4,7 @@ export default function TermsPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Terms of Use</h1>
       <div className="space-y-4 text-gray-700">
         <p>
-          These terms govern your use of Amalgamated Bank's website and digital services.
+          These terms govern your use of ZenaTrust Bank's website and digital services.
         </p>
         <p>
           By accessing our services, you agree to comply with these terms.
