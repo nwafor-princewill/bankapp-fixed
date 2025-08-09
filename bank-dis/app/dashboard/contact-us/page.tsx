@@ -87,7 +87,7 @@ const ContactUs = () => {
                   <div className="border-l-4 border-[#e8742c] pl-4">
                     <h4 className="font-semibold text-[#03305c]">Lost or Stolen Card</h4>
                     <p className="text-gray-600 text-sm">24 hours / 7 days a week</p>
-                    <p className="font-bold text-[#03305c]">amalgamateedbank@gmail.com</p>
+                    <p className="font-bold text-[#03305c]">zenatrustbank@gmail.com</p>
                   </div>
 
                   <div className="border-l-4 border-[#e8742c] pl-4">
@@ -103,11 +103,11 @@ const ContactUs = () => {
                     </div>
                     <div>
                       <h5 className="font-medium text-[#03305c]">Consumer Credit Card</h5>
-                      <p className="text-sm font-bold">amalgamateedbank@gmail.com</p>
+                      <p className="text-sm font-bold">zenatrustbank@gmail.com</p>
                     </div>
                     <div>
                       <h5 className="font-medium text-[#03305c]">Business Credit Card</h5>
-                      <p className="text-sm font-bold">amalgamateedbank@gmail.com</p>
+                      <p className="text-sm font-bold">zenatrustbank@gmail.com</p>
                     </div>
                     <div>
                       <h5 className="font-medium text-[#03305c]">Political Banking</h5>
@@ -128,7 +128,7 @@ const ContactUs = () => {
               <div className="bg-gray-50 p-6 rounded-lg">
                 <h4 className="font-semibold text-[#03305c] mb-2">Investment Management</h4>
                 <p className="text-sm text-gray-600 mb-1">Mon. - Fri. 9 AM - 5 PM ET</p>
-                <p className="font-bold text-[#03305c]">amalgamateedbank@gmail.com</p>
+                <p className="font-bold text-[#03305c]">zenatrustbank@gmail.com</p>
               </div>
             </div>
 
