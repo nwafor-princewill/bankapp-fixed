@@ -11,4 +11,13 @@ export const config = {
 };
 
 
+// Type	Name	Value
+// A	
+// @
+// 216.198.79.1
+
+
+// CNAME	
+// www
+// 78d325684a5e577d.vercel-dns-017.com
 
