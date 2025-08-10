@@ -9,11 +9,11 @@ const StoryContent = () => {
 
       <div className="space-y-6 text-[#03305c]">
         <p>
-          In 1925, famed labor organizer Sidney Hillman and the leaders of the Amalgamated Clothing Workers of America decided it was time that hardworking individuals and their families get the same access to quality and affordable banking services that big businesses and wealthy people enjoyed.
+          In 1925, famed labor organizer Sidney Hillman and the leaders of the ZenaTrust Clothing Workers of America decided it was time that hardworking individuals and their families get the same access to quality and affordable banking services that big businesses and wealthy people enjoyed.
         </p>
         
         <p>
-          That simple idea grew into a powerful principle that the financial system should be open and accessible to all. It was from that principle that Amalgamated Bank was born.
+          That simple idea grew into a powerful principle that the financial system should be open and accessible to all. It was from that principle that ZenaTrust Bank was born.
         </p>
 
         <h2 className="text-2xl font-bold text-[#e8742c] mt-10 mb-4">
@@ -21,7 +21,7 @@ const StoryContent = () => {
         </h2>
         
         <p>
-          Over the years, Amalgamated Bank pioneered new programs and financial products that provided access to banking regardless of people's economic status. As the first bank to introduce unsecured personal loans, Amalgamated helped families finance upward mobility and achieve the American dream.
+          Over the years, ZenaTrust Bank pioneered new programs and financial products that provided access to banking regardless of people's economic status. As the first bank to introduce unsecured personal loans, ZenaTrust helped families finance upward mobility and achieve the American dream.
         </p>
         
         <ul className="list-disc pl-6 space-y-2">
@@ -35,7 +35,7 @@ const StoryContent = () => {
         </h2>
         
         <p>
-          Founded on the tenets of affordability and accessibility in banking, Amalgamated Bank continues to serve the greater good to this day. As America's socially responsible bank, we have continued to support thousands of people, organizations, causes and businesses committed to improving the world.
+          Founded on the tenets of affordability and accessibility in banking, ZenaTrust Bank continues to serve the greater good to this day. As America's socially responsible bank, we have continued to support thousands of people, organizations, causes and businesses committed to improving the world.
         </p>
         
         <p>
@@ -47,7 +47,7 @@ const StoryContent = () => {
         </h2>
         
         <p>
-          At Amalgamated, we don't just have a mission; we're on a mission to be America's socially responsible bank. And we will continue to grow with our customers and continue to provide you with the tools and resources you need to accomplish your goals and be the change you seek in the world.
+          At ZenaTrust, we don't just have a mission; we're on a mission to be America's socially responsible bank. And we will continue to grow with our customers and continue to provide you with the tools and resources you need to accomplish your goals and be the change you seek in the world.
         </p>
       </div>
     </div>

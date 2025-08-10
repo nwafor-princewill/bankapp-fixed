@@ -148,7 +148,7 @@ const BankingFeatures = () => {
               </div>
               <div>
                 <h4 className="font-bold text-[#e8742c] mb-2">Email Support</h4>
-                <p className="text-[#03305c] font-semibold">@amalgamateedbank@gmail.com</p>
+                <p className="text-[#03305c] font-semibold">@zenatrustbank@gmail.com</p>
                 <p className="text-gray-600 text-sm">Get responses within 24 hours</p>
               </div>
               <div>

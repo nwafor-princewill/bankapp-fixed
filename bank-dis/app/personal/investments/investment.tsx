@@ -338,7 +338,7 @@ const Investment = () => {
                   <Mail className="w-5 h-5 text-[#e8742c]" />
                   <div>
                     <p className="font-medium text-gray-800">Email us</p>
-                    <p className="text-sm text-gray-600">amalgamateedbank@gmail.com</p>
+                    <p className="text-sm text-gray-600">zenatrustbank@gmail.com</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -363,7 +363,7 @@ const Investment = () => {
                 <div className="w-8 h-8 bg-[#e8742c] rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-sm">A</span>
                 </div>
-                <span className="text-xl font-bold">amalgamated</span>
+                <span className="text-xl font-bold">ZenaTrust</span>
                 <span className="text-xl font-light">bank</span>
               </div>
               <p className="text-gray-300 mb-4">
