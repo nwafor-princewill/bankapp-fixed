@@ -50,12 +50,12 @@ const ContactPage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: <FaPhone className="text-2xl" />, title: "Personal Banking", number: "+44-7469-549275", hours: "Mon. - Fri. 8 AM - 8 PM & Sat. 9 AM - 2 PM ET" },
-              { icon: <FaCreditCard className="text-2xl" />, title: "Lost or Stolen Card", number: "amalgamateedbank@gmail.com", hours: "24 hours / 7 days a week" },
+              { icon: <FaCreditCard className="text-2xl" />, title: "Lost or Stolen Card", number: "zenatrustbank@gmail.com", hours: "24 hours / 7 days a week" },
               { icon: <FaLock className="text-2xl" />, title: "Online Banking Support", number: "+44-7469-549275 (option 2)", hours: "24 hours / 7 days a week" },
               { icon: <FaShieldAlt className="text-2xl" />, title: "Fraud Help Line", number: "+44-7469-549275", hours: "24 hours / 7 days a week" },
-              { icon: <FaMobileAlt className="text-2xl" />, title: "Consumer Credit Card", number: "amalgamateedbank@gmail.com", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
-              { icon: <FaMobileAlt className="text-2xl" />, title: "Business Credit Card", number: "amalgamateedbank@gmail.com", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
-              { icon: <FaLandmark className="text-2xl" />, title: "Political Banking", number: "amalgamateedbank@gmail.com", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaMobileAlt className="text-2xl" />, title: "Consumer Credit Card", number: "zenatrustbank@gmail.com", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaMobileAlt className="text-2xl" />, title: "Business Credit Card", number: "zenatrustbank@gmail.com", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
+              { icon: <FaLandmark className="text-2xl" />, title: "Political Banking", number: "zenatrustbank@gmail.com", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
               { icon: <FaLandmark className="text-2xl" />, title: "Commercial Banking", number: "+44-7469-549275", hours: "Mon. - Fri. 8 AM - 5 PM ET" },
               { icon: <FaChartLine className="text-2xl" />, title: "Investment Management", number: "+44-7469-549275", hours: "Mon. - Fri. 9 AM - 5 PM ET" },
             ].map((service, index) => (
@@ -78,7 +78,7 @@ const ContactPage = () => {
           <h2 className="text-3xl font-bold text-[#03305c] mb-6">Other Ways to Connect</h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { title: "Mail", detail: "amalgamateedbank@gmail.com\nManchester, United Kingdom, NY 10001" },
+              { title: "Mail", detail: "zenatrustbank@gmail.com\nManchester, United Kingdom, NY 10001" },
               { title: "Secure Message", detail: "Log in to online banking to send a secure message" },
               { title: "Social Media", detail: "Connect with us on Twitter, Facebook, and LinkedIn" },
             ].map((item, index) => (

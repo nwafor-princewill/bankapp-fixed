@@ -13,7 +13,7 @@ const StoryContent = () => {
         </p>
         
         <p>
-          That simple idea grew into a powerful principle that the financial system should be open and accessible to all. It was from that principle that ZenaTrust Bank was born.
+          That simple idea grew into a powerful principle that the financial system should be open and accessible to all. It was from that principle that ZenaTrust was born.
         </p>
 
         <h2 className="text-2xl font-bold text-[#e8742c] mt-10 mb-4">
@@ -21,7 +21,7 @@ const StoryContent = () => {
         </h2>
         
         <p>
-          Over the years, ZenaTrust Bank pioneered new programs and financial products that provided access to banking regardless of people's economic status. As the first bank to introduce unsecured personal loans, ZenaTrust helped families finance upward mobility and achieve the American dream.
+          Over the years, ZenaTrust pioneered new programs and financial products that provided access to banking regardless of people's economic status. As the first bank to introduce unsecured personal loans, ZenaTrust helped families finance upward mobility and achieve the American dream.
         </p>
         
         <ul className="list-disc pl-6 space-y-2">
@@ -35,7 +35,7 @@ const StoryContent = () => {
         </h2>
         
         <p>
-          Founded on the tenets of affordability and accessibility in banking, ZenaTrust Bank continues to serve the greater good to this day. As America's socially responsible bank, we have continued to support thousands of people, organizations, causes and businesses committed to improving the world.
+          Founded on the tenets of affordability and accessibility in banking, ZenaTrust continues to serve the greater good to this day. As America's socially responsible bank, we have continued to support thousands of people, organizations, causes and businesses committed to improving the world.
         </p>
         
         <p>

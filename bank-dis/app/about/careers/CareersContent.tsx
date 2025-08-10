@@ -11,7 +11,7 @@ const CareersContent = () => {
 
       <div className="text-[#03305c] max-w-3xl mx-auto mb-16">
         <p className="text-lg mb-8">
-          At ZenaTrust Bank, we believe that maintaining a diverse and inclusive workplace where everyone feels valued and respected is essential for us to grow as a company. We are dedicated to building a more equitable world in our everyday practices by embracing the values of our employees and customers.
+          At ZenaTrust , we believe that maintaining a diverse and inclusive workplace where everyone feels valued and respected is essential for us to grow as a company. We are dedicated to building a more equitable world in our everyday practices by embracing the values of our employees and customers.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -33,7 +33,7 @@ const CareersContent = () => {
       </h2>
 
       <p className="text-lg text-[#03305c] max-w-3xl mx-auto mb-12 text-center">
-        At ZenaTrust Bank, our employees are our greatest asset and investing in their well-being is essential. We are committed to investing in our employees through a comprehensive compensation and benefits package.
+        At ZenaTrust , our employees are our greatest asset and investing in their well-being is essential. We are committed to investing in our employees through a comprehensive compensation and benefits package.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -51,7 +51,7 @@ const CareersContent = () => {
           {
             icon: <FaPiggyBank className="text-4xl text-[#e8742c] mb-4" />,
             title: 'Pension Plan',
-            description: 'ZenaTrust Bank offers a pension plan, in addition to a 401(k), to help you save and provide financial income for the future.'
+            description: 'ZenaTrust offers a pension plan, in addition to a 401(k), to help you save and provide financial income for the future.'
           },
           {
             icon: <FaHeart className="text-4xl text-[#e8742c] mb-4" />,

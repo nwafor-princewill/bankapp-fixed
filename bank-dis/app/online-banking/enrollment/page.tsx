@@ -91,7 +91,7 @@ const OnlineBankingEnrollment = () => {
               </div>
               <div className="md:w-2/3">
                 <p className="text-[#03305c] mb-4">
-                  Transfer funds with ease through Online Banking. Move money between your ZenaTrust Bank accounts as well as accounts held at other U.S. institutions. You can also schedule transfers of funds.
+                  Transfer funds with ease through Online Banking. Move money between your ZenaTrust  accounts as well as accounts held at other U.S. institutions. You can also schedule transfers of funds.
                 </p>
                 <div className="flex items-center text-[#03305c]">
                   <FaMobileAlt className="text-[#e8742c] mr-2" />

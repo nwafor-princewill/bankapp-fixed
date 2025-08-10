@@ -4,7 +4,7 @@ export default function CookiePolicyPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Cookie Policy</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          ZenaTrust Bank uses cookies and similar technologies to enhance your 
+          ZenaTrust uses cookies and similar technologies to enhance your 
           online banking experience and improve our services.
         </p>
         

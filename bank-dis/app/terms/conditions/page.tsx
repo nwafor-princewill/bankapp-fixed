@@ -4,7 +4,7 @@ export default function TermsConditionsPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">General Terms and Conditions</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          These General Terms and Conditions govern your use of ZenaTrust Bank's 
+          These General Terms and Conditions govern your use of ZenaTrust
           products, services, and digital platforms.
         </p>
         
@@ -21,7 +21,7 @@ export default function TermsConditionsPage() {
         
         <p className="mt-8 text-[#03305c] font-medium">
           For clarification of any terms or conditions, please contact our legal 
-          department at amalgamateedbank@gmail.com.
+          department at zenatrustbank@gmail.com.
         </p>
       </div>
     </div>

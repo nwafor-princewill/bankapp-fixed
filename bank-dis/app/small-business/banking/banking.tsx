@@ -70,7 +70,7 @@ const BusinessBankingTools = () => {
         <div className="bg-[#f5f5f5] p-8 rounded-lg">
           <h3 className="text-2xl font-bold text-[#e8742c] mb-4">Learn about our mission</h3>
           <p className="text-[#03305c]">
-            ZenaTrust Bank is for those who want the power to make more impact by using the financial system to advance social goals. 
+            ZenaTrust is for those who want the power to make more impact by using the financial system to advance social goals. 
             We are committed to ensuring your personal prosperity leads to collective prosperity for all of us and our planet.
           </p>
         </div>

@@ -12,7 +12,7 @@ export default function BillPaymentPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    bankName: 'ZenaTrust Bank',
+    bankName: 'ZenaTrust',
     billerId: '',
     amount: '',
     paymentDate: new Date().toISOString().split('T')[0],
@@ -136,7 +136,7 @@ export default function BillPaymentPage() {
       setShowReceipt(true);
 
       setFormData({
-        bankName: 'ZenaTrust Bank',
+        bankName: 'ZenaTrust',
         billerId: '',
         amount: '',
         paymentDate: new Date().toISOString().split('T')[0],

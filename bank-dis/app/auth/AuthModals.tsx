@@ -378,7 +378,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         </button>
 
         <h2 className="text-xl sm:text-2xl font-bold text-[#03305c] mb-6 pr-8">
-          Welcome to ZenaTrust Bank
+          Welcome to ZenaTrust
         </h2>
 
         {error && (

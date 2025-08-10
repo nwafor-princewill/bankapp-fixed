@@ -4,7 +4,7 @@ export default function PrivacyControlsPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Privacy Controls</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          ZenaTrust Bank provides you with tools to manage your privacy preferences.
+          ZenaTrust provides you with tools to manage your privacy preferences.
           You can control how we collect and use your information through these settings.
         </p>
         
@@ -19,7 +19,7 @@ export default function PrivacyControlsPage() {
         </p>
         
         <p className="mt-8 text-[#03305c] font-medium">
-          For assistance with privacy controls, email us at amalgamateedbank@gmail.com.
+          For assistance with privacy controls, email us at zenatrustbank@gmail.com.
         </p>
       </div>
     </div>

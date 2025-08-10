@@ -21,7 +21,7 @@ const CreditCards = () => {
     {
       icon: <DollarSign className="w-8 h-8 text-blue-600" />,
       title: "Transfer funds easily",
-      description: "Transfer money with ease through Online Banking. Move money between your ZenaTrust Bank accounts as well as accounts held at other U.S. institutions. You can also schedule transfers or funds automatically from your existing checking account."
+      description: "Transfer money with ease through Online Banking. Move money between your ZenaTrust accounts as well as accounts held at other U.S. institutions. You can also schedule transfers or funds automatically from your existing checking account."
     },
     {
       icon: <Smartphone className="w-8 h-8 text-blue-600" />,
@@ -74,7 +74,7 @@ const CreditCards = () => {
                     <div className={`${card.color} h-32 flex items-center justify-center`}>
                       <div className="text-white text-center">
                         <CreditCard className="w-8 h-8 mx-auto mb-2" />
-                        <span className="text-sm font-medium">ZenaTrust Bank</span>
+                        <span className="text-sm font-medium">ZenaTrust </span>
                       </div>
                     </div>
                     <div className="p-6">

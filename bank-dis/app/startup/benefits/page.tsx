@@ -4,7 +4,7 @@ export default function StartupBenefitsPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Startup Banking Benefits</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          ZenaTrust Bank offers exclusive benefits for startups, including fee 
+          ZenaTrust offers exclusive benefits for startups, including fee 
           waivers for the first 12 months and dedicated banking relationship managers.
         </p>
         
@@ -19,7 +19,7 @@ export default function StartupBenefitsPage() {
         </p>
         
         <p className="mt-8 text-[#03305c] font-medium">
-          Learn more about our startup benefits by emailing amalgamateedbank@gmail.com.
+          Learn more about our startup benefits by emailing zenatrustbank@gmail.com.
         </p>
       </div>
     </div>

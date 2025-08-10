@@ -16,7 +16,7 @@ const FAQPage = () => {
       icon: <FaShieldAlt className="text-2xl text-[#e8742c]" />,
       questions: [
         {
-          question: "How does ZenaTrust Bank protect my account?",
+          question: "How does ZenaTrust protect my account?",
           answer: "We use multi-layered security including encryption, fraud monitoring, and secure login with multi-factor authentication to protect your accounts 24/7."
         },
         {
@@ -72,7 +72,7 @@ const FAQPage = () => {
       icon: <FaQuestionCircle className="text-2xl text-[#e8742c]" />,
       questions: [
         {
-          question: "What makes ZenaTrust Bank different?",
+          question: "What makes ZenaTrust different?",
           answer: "As America's socially responsible bank, we align our services with your values—investing in communities and refusing to support harmful industries."
         },
         {

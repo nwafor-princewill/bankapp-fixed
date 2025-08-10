@@ -31,7 +31,7 @@ const SecureBank = () => {
         <main className='flex flex-col-reverse md:flex-col lg:flex-row justify-between items-center gap-8 md:gap-12'>
           <div className='w-full max-w-xl order-2 lg:order-1'>
             <h2 className='text-xl sm:text-2xl font-semibold text-[#03305c] mb-4 md:mb-6'>
-              Manage your accounts on the go with ZenaTrust Bank's mobile app
+              Manage your accounts on the go with ZenaTrust  mobile app
             </h2>
             
             <ul className='space-y-2 sm:space-y-3 mb-6 md:mb-8'>

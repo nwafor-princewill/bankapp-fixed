@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZenaTrust Bank | Secure Online Banking",
-  description: "ZenaTrust Bank offers secure online banking, investment services, and financial solutions for individuals and businesses.",
+  title: "ZenaTrust | Secure Online Banking",
+  description: "ZenaTrust offers secure online banking, investment services, and financial solutions for individuals and businesses.",
   keywords: ["online banking", "personal accounts", "business banking", "loans", "investments"],
   viewport: "width=device-width, initial-scale=1",
   themeColor: "#03305c",

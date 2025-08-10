@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
             {/* Facts Section */}
             <section>
               <h2 className="text-2xl font-semibold text-[#03305c] mb-4">
-                What does ZenaTrust Bank do with your personal information?
+                What does ZenaTrust do with your personal information?
               </h2>
               
               <div className="bg-[#03305c] text-white p-6 rounded-lg mb-6">
@@ -47,7 +47,7 @@ const PrivacyPolicy = () => {
                   <thead>
                     <tr className="bg-[#03305c] text-white">
                       <th className="border border-gray-300 p-3 text-left">Reasons we can share your personal information</th>
-                      <th className="border border-gray-300 p-3 text-center">Does ZenaTrust Bank share?</th>
+                      <th className="border border-gray-300 p-3 text-center">Does ZenaTrust share?</th>
                       <th className="border border-gray-300 p-3 text-center">Can you limit this sharing?</th>
                     </tr>
                   </thead>
@@ -119,7 +119,7 @@ const PrivacyPolicy = () => {
               <div className="bg-[#03305c] text-white p-6 rounded-lg text-center">
                 <h3 className="text-xl font-semibold mb-2">Questions?</h3>
                 <p className="text-lg">Call toll-free: <span className="font-bold">+44-7469-549275</span></p>
-                <p className="text-sm mt-2 opacity-90">© 2025 ZenaTrust Bank. All rights reserved.</p>
+                <p className="text-sm mt-2 opacity-90">© 2025 ZenaTrust . All rights reserved.</p>
               </div>
             </section>
           </div>

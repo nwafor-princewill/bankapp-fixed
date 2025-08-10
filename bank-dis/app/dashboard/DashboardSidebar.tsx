@@ -156,7 +156,7 @@ const DashboardSidebar = () => {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-4 flex items-center justify-center border-b border-[#1e4770] h-16">
-          <h1 className="text-xl font-bold">ZenaTrust Bank</h1>
+          <h1 className="text-xl font-bold">ZenaTrust</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto">

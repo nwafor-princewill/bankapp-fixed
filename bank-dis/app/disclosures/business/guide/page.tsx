@@ -4,7 +4,7 @@ export default function BusinessGuidePage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Small Business Banking Guide</h1>
       <div className="space-y-6 text-gray-700 text-lg">
         <p>
-          This comprehensive guide covers all aspects of ZenaTrust Bank's small 
+          This comprehensive guide covers all aspects of ZenaTrust small 
           business banking services, from account setup to advanced cash management.
         </p>
         
@@ -20,7 +20,7 @@ export default function BusinessGuidePage() {
         
         <p className="mt-8 text-[#03305c] font-medium">
           Our business banking specialists are available to help at 
-          amalgamateedbank@gmail.com.
+          zenatrustbank@gmail.com.
         </p>
       </div>
     </div>

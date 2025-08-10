@@ -4,13 +4,13 @@ export default function SecurityPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#03305c]">Security Center</h1>
       <div className="space-y-4 text-gray-700">
         <p>
-          At ZenaTrust Bank, we prioritize the security of your accounts and personal information.
+          At ZenaTrust, we prioritize the security of your accounts and personal information.
         </p>
         <p>
           Our advanced security measures protect your data 24/7, giving you peace of mind.
         </p>
         <p>
-          For security concerns, contact us immediately at amalgamateedbank@gmail.com.
+          For security concerns, contact us immediately at zenatrustbank@gmail.com.
         </p>
       </div>
     </div>

@@ -83,7 +83,7 @@ const Navbar = () => {
           <nav className='flex cursor-pointer relative items-center p-5 max-w-7xl mx-auto'>
             {/* --- LOGO CHANGE FOR DESKTOP --- */}
             <Link href="/" className="text-2xl font-extrabold text-[#03305c]">
-                ZenaTrust Bank
+                ZenaTrust 
             </Link>
             {/* <div><Image src={plogo} alt='logo' width={180} height={50} /></div> */}
             
@@ -185,7 +185,7 @@ const Navbar = () => {
           
           {/* --- LOGO CHANGE FOR MOBILE --- */}
           <Link href="/" className="text-xl font-extrabold text-[#03305c]">
-            ZenaTrust Bank
+            ZenaTrust 
           </Link>
           {/* <div><Image src={plogo} alt='logo' width={120} height={40} /></div> */}
 
