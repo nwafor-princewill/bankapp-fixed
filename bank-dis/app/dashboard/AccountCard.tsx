@@ -67,11 +67,11 @@ const AccountCard: React.FC<AccountCardProps> = ({
         )}
         
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <p className="text-sm text-gray-500">Current Balance</p>
             <button
               onClick={() => setShowBalance(!showBalance)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-black hover:text-gray-700 transition-colors"
             >
               {showBalance ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
