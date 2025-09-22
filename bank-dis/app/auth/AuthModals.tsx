@@ -4,7 +4,6 @@ import { ImCancelCircle } from 'react-icons/im';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-/* import { usePin } from '@/app/contexts/PinContext'; */
 
 interface AuthModalsProps {
   showLogin: boolean;
@@ -13,7 +12,7 @@ interface AuthModalsProps {
   defaultTab?: 'login' | 'signup';
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bank-backend-eagz.onrender.com';
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'KRW', 'BRL', 'MXN', 'SGD', 'HKD', 'SEK', 'NOK', 'ZAR', 'RUB', 'TRY', 'NGN'] as const;
 
@@ -25,15 +24,16 @@ const SECURITY_QUESTIONS = [
   "What was your childhood nickname?"
 ];
 
-const AuthModals: React.FC<AuthModalsProps> = ({ 
-  showLogin, 
-  showSignup, 
+const AuthModals: React.FC<AuthModalsProps> = ({
+  showLogin,
+  showSignup,
   onClose,
   defaultTab = 'login'
 }) => {
   const router = useRouter();
-  /* const { checkPinStatus } = usePin(); */
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>(defaultTab);
+  const [showOtpStep, setShowOtpStep] = useState(false);
+  const [otp, setOtp] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -94,17 +94,22 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     if (!email) {
       return { isValid: false, message: 'Email is required' };
     }
-    
+
     if (!validateEmail(email)) {
       if (!email.includes('@')) {
         return { isValid: false, message: 'Email must contain @ symbol (e.g., user@gmail.com)' };
       }
       if (!email.includes('.') || email.split('@')[1]?.split('.').length < 2) {
-        return { isValid: false, message: 'Email must include domain extension (e.g., user@gmail.com)' };
+        return { isValid: false, message: 'Email must include a valid domain extension (e.g., .com, not .con)' };
       }
       return { isValid: false, message: 'Please enter a valid email address (e.g., user@gmail.com)' };
     }
-    
+
+    const domain = email.split('@')[1].toLowerCase();
+    if (domain === 'gmail.con') {
+      return { isValid: false, message: 'Did you mean @gmail.com? Please correct the email domain.' };
+    }
+
     return { isValid: true };
   };
 
@@ -120,7 +125,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const handleSecurityQuestionChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     const fieldName = name.replace(`securityQuestions[${index}].`, '');
-    
+
     setFormData(prev => {
       const newQuestions = [...prev.securityQuestions];
       newQuestions[index] = {
@@ -143,48 +148,44 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     if (error) setError('');
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    const emailValidation = validateEmailWithSuggestions(loginData.email);
+
+    const emailValidation = validateEmailWithSuggestions(formData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
       return;
     }
-    
+
+    if (!formData.firstName.trim()) {
+      setError('First name is required to send OTP');
+      return;
+    }
+
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`${API_URL}/api/auth/send-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: loginData.email,
-          password: loginData.password
+          email: formData.email.trim().toLowerCase(),
+          firstName: formData.firstName.trim(),
         }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
-        // if (response.status === 403) {
-        //   throw new Error('Your account has been blocked. Please contact support.');
-        // }
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || 'Failed to send OTP');
       }
 
-      //change for login
-      localStorage.setItem('token', data.token);
-      // document.cookie = `token=${data.token}; path=/; max-age=2592000; SameSite=Lax; Secure`;
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      /* await checkPinStatus(); */
-      onClose();
-      router.push('/dashboard');
+      toast.success('OTP sent to your email. Please check your inbox (and spam folder).');
+      setShowOtpStep(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to send OTP');
+      console.error('Send OTP error:', err);
     }
   };
 
@@ -192,36 +193,41 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     e.preventDefault();
     setError('');
 
+    if (!otp.trim()) {
+      setError('Please enter the OTP sent to your email');
+      return;
+    }
+
     const incompleteQuestions = formData.securityQuestions.some(
       q => !q.question.trim() || !q.answer.trim()
     );
-    
+
     if (incompleteQuestions) {
       setError('Please complete all security questions');
       return;
     }
-    
+
     const emailValidation = validateEmailWithSuggestions(formData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
       return;
     }
-    
+
     if (!formData.firstName.trim()) {
       setError('First name is required');
       return;
     }
-    
+
     if (!formData.lastName.trim()) {
       setError('Last name is required');
       return;
     }
-    
+
     if (!formData.phone.trim()) {
       setError('Phone number is required');
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
@@ -253,13 +259,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     }
 
     for (let i = 0; i < formData.securityQuestions.length; i++) {
-      const question = formData.securityQuestions[i];
-      if (!question.question || !question.answer) {
+      if (!formData.securityQuestions[i].question || !formData.securityQuestions[i].answer) {
         setError('Please complete all security questions');
         return;
       }
     }
-    
+
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
@@ -279,27 +284,65 @@ const AuthModals: React.FC<AuthModalsProps> = ({
           state: formData.state,
           address: formData.address,
           securityQuestions: formData.securityQuestions,
-          currency: formData.currency
+          currency: formData.currency,
+          otp,
         }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
       }
 
-      //change for signup
       localStorage.setItem('token', data.token);
-      // document.cookie = `token=${data.token}; path=/; max-age=2592000; SameSite=Lax; Secure`;
       localStorage.setItem('user', JSON.stringify(data.user));
-      
-      /* await checkPinStatus(); */
+
       onClose();
+      toast.success('Account created successfully!');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
       console.error('Signup error:', err);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    const emailValidation = validateEmailWithSuggestions(loginData.email);
+    if (!emailValidation.isValid) {
+      setError(emailValidation.message || 'Invalid email format');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: loginData.email,
+          password: loginData.password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      onClose();
+      router.push('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+      console.error('Login error:', err);
     }
   };
 
@@ -315,7 +358,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to send reset email');
       }
@@ -325,7 +368,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         setShowForgotPassword(false);
         setResetSuccess(false);
       }, 3000);
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process request');
     }
@@ -340,7 +383,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           token: resetToken,
           newPassword
         }),
@@ -359,7 +402,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         onClose();
         router.replace('/');
       }, 2000);
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reset password');
     }
@@ -370,7 +413,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 sm:p-8 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
         >
@@ -392,8 +435,8 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             <button
               type="button"
               className={`py-2 px-4 font-medium transition-colors ${
-                activeTab === 'login' 
-                  ? 'text-[#03305c] border-b-2 border-[#03305c]' 
+                activeTab === 'login'
+                  ? 'text-[#03305c] border-b-2 border-[#03305c]'
                   : 'text-gray-500 hover:text-[#03305c]'
               }`}
               onClick={() => setActiveTab('login')}
@@ -403,8 +446,8 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             <button
               type="button"
               className={`py-2 px-4 font-medium transition-colors ${
-                activeTab === 'signup' 
-                  ? 'text-[#03305c] border-b-2 border-[#03305c]' 
+                activeTab === 'signup'
+                  ? 'text-[#03305c] border-b-2 border-[#03305c]'
                   : 'text-gray-500 hover:text-[#03305c]'
               }`}
               onClick={() => setActiveTab('signup')}
@@ -413,6 +456,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             </button>
           </div>
         )}
+
         {activeTab === 'login' && !showForgotPassword && !showResetPassword ? (
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -453,8 +497,8 @@ const AuthModals: React.FC<AuthModalsProps> = ({
               </button>
             </div>
             <div className="flex justify-between items-center">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="text-sm text-[#03305c] hover:underline"
                 onClick={() => setShowForgotPassword(true)}
               >
@@ -471,8 +515,8 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         ) : null}
 
         {activeTab === 'signup' && !showForgotPassword && !showResetPassword ? (
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          !showOtpStep ? (
+            <form onSubmit={handleSendOtp} className="space-y-4">
               <div>
                 <label htmlFor="signup-firstName" className="block text-sm font-medium text-gray-700 mb-1">
                   First Name
@@ -489,233 +533,298 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                 />
               </div>
               <div>
-                <label htmlFor="signup-lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name
+                <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
                 </label>
                 <input
-                  type="text"
-                  id="signup-lastName"
-                  name="lastName"
-                  value={formData.lastName}
+                  type="email"
+                  id="signup-email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                  placeholder="Last name"
+                  placeholder="Enter your email (e.g., user@gmail.com)"
                   required
                 />
               </div>
-            </div>
-            <div>
-              <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="signup-email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                placeholder="Enter your email (e.g., user@gmail.com)"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="signup-phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="signup-phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                placeholder="Enter your phone number"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="submit"
+                className="w-full bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:ring-offset-2"
+              >
+                Send OTP
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSignup} className="space-y-4">
               <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-                  Gender
+                <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
+                  OTP (Check your email)
+                </label>
+                <input
+                  type="text"
+                  id="otp"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Enter 6-digit OTP"
+                  required
+                  maxLength={6}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="signup-firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="signup-firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="First name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="signup-lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="signup-lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="Last name"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="signup-email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Enter your email (e.g., user@gmail.com)"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="signup-phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Enter your phone number"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender
+                  </label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    required
+                  >
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    required
+                    max={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    id="country"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="Country"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                    State/Province
+                  </label>
+                  <input
+                    type="text"
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                    placeholder="State/Province"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Full address"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Currency
                 </label>
                 <select
-                  id="gender"
-                  name="gender"
-                  value={formData.gender}
+                  id="currency"
+                  name="currency"
+                  value={formData.currency}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
                   required
                 >
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  {CURRENCIES.map(currency => (
+                    <option key={currency} value={currency}>{currency}</option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
-                  Date of Birth
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Security Questions
                 </label>
-                <input
-                  type="date"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                  required
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  id="country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                  placeholder="Country"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                  State/Province
-                </label>
-                <input
-                  type="text"
-                  id="state"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                  placeholder="State/Province"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Address
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                placeholder="Full address"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
-                Preferred Currency
-              </label>
-              <select
-                id="currency"
-                name="currency"
-                value={formData.currency}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                required
-              >
-                {CURRENCIES.map(currency => (
-                  <option key={currency} value={currency}>{currency}</option>
+                {formData.securityQuestions.map((question, index) => (
+                  <div key={index} className="mb-4">
+                    <select
+                      name={`securityQuestions[${index}].question`}
+                      value={question.question}
+                      onChange={handleSecurityQuestionChange(index)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent mb-2"
+                      required
+                    >
+                      <option value="">Select a security question</option>
+                      {SECURITY_QUESTIONS.map((q, i) => (
+                        <option key={i} value={q}>{q}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      name={`securityQuestions[${index}].answer`}
+                      value={question.answer}
+                      onChange={handleSecurityQuestionChange(index)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                      placeholder="Your answer"
+                      required
+                    />
+                  </div>
                 ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Security Questions
-              </label>
-              {formData.securityQuestions.map((question, index) => (
-                <div key={index} className="mb-4">
-                  <select
-                    name={`securityQuestions[${index}].question`}
-                    value={question.question}
-                    onChange={handleSecurityQuestionChange(index)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent mb-2"
-                    required
-                  >
-                    <option value="">Select a security question</option>
-                    {SECURITY_QUESTIONS.map((q, i) => (
-                      <option key={i} value={q}>{q}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    name={`securityQuestions[${index}].answer`}
-                    value={question.answer}
-                    onChange={handleSecurityQuestionChange(index)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                    placeholder="Your answer"
-                    required
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="relative">
-              <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
-                Create Password
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="signup-password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                placeholder="Create a password (min. 6 characters)"
-                required
-                minLength={6}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-8 text-gray-500"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-            <div className="relative">
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
-              </label>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                id="confirm-password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
-                placeholder="Confirm your password"
-                required
-                minLength={6}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-8 text-gray-500"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:ring-offset-2"
-            >
-              Open Account
-            </button>
-          </form>
+              </div>
+              <div className="relative">
+                <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Create Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="signup-password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Create a password (min. 6 characters)"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-8 text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              <div className="relative">
+                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirm-password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  placeholder="Confirm your password"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-8 text-gray-500"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowOtpStep(false)}
+                  className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:ring-offset-2"
+                >
+                  Open Account
+                </button>
+              </div>
+            </form>
+          )
         ) : null}
 
         {showForgotPassword && (
