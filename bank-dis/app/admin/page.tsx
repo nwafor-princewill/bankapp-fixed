@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -72,6 +73,11 @@ export default function AdminDashboard() {
   const [showBackdateModal, setShowBackdateModal] = useState(false);
   const [modificationHistory, setModificationHistory] = useState<ModificationHistory[]>([]);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  // NEW: Add password form state
+  const [passwordForm, setPasswordForm] = useState({
+    userId: '',
+    newPassword: '',
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -252,57 +258,32 @@ export default function AdminDashboard() {
 
   //delete user
   const deleteUser = async (userId: string) => {
-  if (!confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/api/admin/delete-user/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    const data = await response.json();
-    if (response.ok) {
-      toast.success(data.message);
-      setUsers(users.filter(user => user._id !== userId));
-    } else {
-      throw new Error(data.message || 'Failed to delete user');
+    if (!confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
+      return;
     }
-  } catch (err) {
-    console.error('Delete user failed:', err);
-    toast.error(err instanceof Error ? err.message : 'Operation failed');
-  }
-};
 
-  const handleBtcUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/update-btc`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/api/admin/delete-user/${userId}`, {
+        method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ newAddress: newBtcAddress })
+        }
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
-
-      toast.success(data.message);
-      fetchAdminData();
+      if (response.ok) {
+        toast.success(data.message);
+        setUsers(users.filter(user => user._id !== userId));
+      } else {
+        throw new Error(data.message || 'Failed to delete user');
+      }
     } catch (err) {
-      console.error('BTC update failed:', err);
-      toast.error(err instanceof Error ? err.message : 'BTC address update failed');
+      console.error('Delete user failed:', err);
+      toast.error(err instanceof Error ? err.message : 'Operation failed');
     }
   };
 
-  // Add this with your other functions, probably around line 200-300 in your file
   const deleteTransaction = async (transactionId: string) => {
     if (!confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
       return;
@@ -327,6 +308,30 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Delete transaction failed:', err);
       toast.error(err instanceof Error ? err.message : 'Operation failed');
+    }
+  };
+
+  const handleBtcUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/admin/update-btc`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ newAddress: newBtcAddress })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      toast.success(data.message);
+      fetchAdminData();
+    } catch (err) {
+      console.error('BTC update failed:', err);
+      toast.error(err instanceof Error ? err.message : 'BTC address update failed');
     }
   };
 
@@ -535,6 +540,15 @@ export default function AdminDashboard() {
           <FiSettings className="inline mr-1" />
           Settings
         </button>
+        {/* NEW: Add Password Management Tab */}
+        <button
+          onClick={() => setActiveTab('passwords')}
+          className={`px-4 py-2 rounded ${
+            activeTab === 'passwords' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
+          Password Management
+        </button>
       </div>
 
       {/* Content */}
@@ -655,7 +669,6 @@ export default function AdminDashboard() {
                     </td>
                     <td className="py-3 px-4 capitalize">{txn.type}</td>
                     
-                    {/* ADD/REPLACE THIS CELL WITH YOUR CODE */}
                     <td className="py-3 px-4 flex">
                       <button
                         onClick={() => {
@@ -781,6 +794,134 @@ export default function AdminDashboard() {
                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 >
                   Update BTC Address
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Add Password Management Content */}
+      {activeTab === 'passwords' && (
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-semibold mb-4">Password Management</h2>
+          <div className="space-y-6">
+            {/* Change Password Form */}
+            <div>
+              <h3 className="text-lg font-medium mb-3">Change User Password</h3>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${API_URL}/api/admin/change-password`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                      },
+                      body: JSON.stringify(passwordForm),
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message);
+
+                    toast.success(data.message);
+                    setPasswordForm({ userId: '', newPassword: '' });
+                  } catch (err) {
+                    console.error('Change password failed:', err);
+                    toast.error(err instanceof Error ? err.message : 'Failed to change password');
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium mb-1">Select User</label>
+                  <select
+                    value={passwordForm.userId}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, userId: e.target.value })}
+                    className="w-full p-2 border rounded"
+                    required
+                  >
+                    <option value="">Select a user</option>
+                    {users.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.firstName} {user.lastName} ({user.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">New Password</label>
+                  <input
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                    className="w-full p-2 border rounded"
+                    placeholder="Enter new password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  Change Password
+                </button>
+              </form>
+            </div>
+
+            {/* Reset Password Form */}
+            <div>
+              <h3 className="text-lg font-medium mb-3">Reset User Password</h3>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`${API_URL}/api/admin/reset-user-password`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ userId: passwordForm.userId }),
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message);
+
+                    toast.success(data.message);
+                    setPasswordForm({ userId: '', newPassword: '' });
+                  } catch (err) {
+                    console.error('Reset password failed:', err);
+                    toast.error(err instanceof Error ? err.message : 'Failed to reset password');
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium mb-1">Select User</label>
+                  <select
+                    value={passwordForm.userId}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, userId: e.target.value })}
+                    className="w-full p-2 border rounded"
+                    required
+                  >
+                    <option value="">Select a user</option>
+                    {users.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.firstName} {user.lastName} ({user.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  Send Reset Link
                 </button>
               </form>
             </div>
