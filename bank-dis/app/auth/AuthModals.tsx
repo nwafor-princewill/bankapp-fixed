@@ -181,10 +181,11 @@ const AuthModals: React.FC<AuthModalsProps> = ({
         throw new Error(data.message || 'Failed to send OTP');
       }
 
-      toast.success('OTP sent to your email. Please check your inbox (and spam folder).');
+      toast.success('OTP sent to your email. Please check your inbox and spam folder.');
       setShowOtpStep(true);
+      console.log('OTP sent successfully for email:', formData.email);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send OTP');
+      setError(err instanceof Error ? err.message : 'Failed to send OTP. Please try again.');
       console.error('Send OTP error:', err);
     }
   };
@@ -195,6 +196,11 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
     if (!otp.trim()) {
       setError('Please enter the OTP sent to your email');
+      return;
+    }
+
+    if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+      setError('Please enter a valid 6-digit OTP');
       return;
     }
 
@@ -301,8 +307,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       onClose();
       toast.success('Account created successfully!');
       router.push('/dashboard');
+      console.log('Registration successful for user:', data.user.email);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
       console.error('Signup error:', err);
     }
   };
@@ -339,6 +346,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       localStorage.setItem('user', JSON.stringify(data.user));
 
       onClose();
+      toast.success('Logged in successfully!');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
@@ -558,17 +566,18 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             <form onSubmit={handleSignup} className="space-y-4">
               <div>
                 <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
-                  OTP (Check your email)
+                  OTP (Check your email and spam folder)
                 </label>
                 <input
                   type="text"
                   id="otp"
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent text-center font-mono tracking-wider"
                   placeholder="Enter 6-digit OTP"
                   required
                   maxLength={6}
+                  inputMode="numeric"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -795,7 +804,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] ragged-right"
                   placeholder="Confirm your password"
                   required
                   minLength={6}
@@ -811,7 +820,10 @@ const AuthModals: React.FC<AuthModalsProps> = ({
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowOtpStep(false)}
+                  onClick={() => {
+                    setShowOtpStep(false);
+                    setOtp('');
+                  }}
                   className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
                 >
                   Back
