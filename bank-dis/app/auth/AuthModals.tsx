@@ -24,6 +24,8 @@ const SECURITY_QUESTIONS = [
   "What was your childhood nickname?"
 ];
 
+const ID_TYPES = ['passport', 'national_id', 'drivers_license'];
+
 const AuthModals: React.FC<AuthModalsProps> = ({
   showLogin,
   showSignup,
@@ -50,7 +52,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     securityQuestions: [
       { question: '', answer: '' },
       { question: '', answer: '' }
-    ]
+    ],
+    idType: '', // NEW: ID type
+    idDocument: null as File | null // NEW: ID document file
   });
   const [loginData, setLoginData] = useState({
     email: '',
@@ -120,6 +124,15 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       [name]: value,
     }));
     if (error) setError('');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData(prev => ({
+        ...prev,
+        idDocument: e.target.files![0],
+      }));
+    }
   };
 
   const handleSecurityQuestionChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -204,6 +217,16 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       return;
     }
 
+    if (!formData.idType) {
+      setError('Please select an ID type');
+      return;
+    }
+
+    if (!formData.idDocument) {
+      setError('Please upload an ID document');
+      return;
+    }
+
     const incompleteQuestions = formData.securityQuestions.some(
       q => !q.question.trim() || !q.answer.trim()
     );
@@ -272,27 +295,27 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     }
 
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('firstName', formData.firstName.trim());
+      formDataToSend.append('lastName', formData.lastName.trim());
+      formDataToSend.append('email', formData.email.trim().toLowerCase());
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('confirmPassword', formData.confirmPassword);
+      formDataToSend.append('gender', formData.gender);
+      formDataToSend.append('dateOfBirth', formData.dateOfBirth);
+      formDataToSend.append('country', formData.country);
+      formDataToSend.append('state', formData.state);
+      formDataToSend.append('address', formData.address);
+      formDataToSend.append('phone', formData.phone.trim());
+      formDataToSend.append('currency', formData.currency);
+      formDataToSend.append('otp', otp);
+      formDataToSend.append('idType', formData.idType);
+      formDataToSend.append('idDocument', formData.idDocument!); // Append file
+      formDataToSend.append('securityQuestions', JSON.stringify(formData.securityQuestions));
+
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          email: formData.email.trim().toLowerCase(),
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          phone: formData.phone.trim(),
-          gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth,
-          country: formData.country,
-          state: formData.state,
-          address: formData.address,
-          securityQuestions: formData.securityQuestions,
-          currency: formData.currency,
-          otp,
-        }),
+        body: formDataToSend,
       });
 
       const data = await response.json();
@@ -804,7 +827,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] ragged-right"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:border-transparent"
                   placeholder="Confirm your password"
                   required
                   minLength={6}
