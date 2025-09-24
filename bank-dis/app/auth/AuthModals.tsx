@@ -939,7 +939,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                     onClick={() => setShowResetPassword(false)}
                     className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
                   >
-                    Cancel
+                    Cance
                   </button>
                   <button
                     type="submit"
