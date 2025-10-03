@@ -49,9 +49,13 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     state: '',
     address: '',
     currency: 'USD',
+    // securityQuestions: [
+    //   { question: '', answer: '' },
+    //   { question: '', answer: '' }
+    // ],
     securityQuestions: [
-      { question: '', answer: '' },
-      { question: '', answer: '' }
+      { question: SECURITY_QUESTIONS[0], answer: '' }, // Initialize with default question
+      { question: SECURITY_QUESTIONS[1], answer: '' }  // Initialize with default question
     ],
     idType: '', // NEW: ID type
     idDocument: null as File | null // NEW: ID document file
