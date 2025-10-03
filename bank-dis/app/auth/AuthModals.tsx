@@ -294,47 +294,62 @@ const AuthModals: React.FC<AuthModalsProps> = ({
       }
     }
 
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('firstName', formData.firstName.trim());
-      formDataToSend.append('lastName', formData.lastName.trim());
-      formDataToSend.append('email', formData.email.trim().toLowerCase());
-      formDataToSend.append('password', formData.password);
-      formDataToSend.append('confirmPassword', formData.confirmPassword);
-      formDataToSend.append('gender', formData.gender);
-      formDataToSend.append('dateOfBirth', formData.dateOfBirth);
-      formDataToSend.append('country', formData.country);
-      formDataToSend.append('state', formData.state);
-      formDataToSend.append('address', formData.address);
-      formDataToSend.append('phone', formData.phone.trim());
-      formDataToSend.append('currency', formData.currency);
-      formDataToSend.append('otp', otp);
-      formDataToSend.append('idType', formData.idType);
-      formDataToSend.append('idDocument', formData.idDocument!); // Append file
-      formDataToSend.append('securityQuestions', JSON.stringify(formData.securityQuestions));
-
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      onClose();
-      toast.success('Account created successfully!');
-      router.push('/dashboard');
-      console.log('Registration successful for user:', data.user.email);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
-      console.error('Signup error:', err);
+   try {
+    const formDataToSend = new FormData();
+    
+    // Append all text fields
+    formDataToSend.append('firstName', formData.firstName.trim());
+    formDataToSend.append('lastName', formData.lastName.trim());
+    formDataToSend.append('email', formData.email.trim().toLowerCase());
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('confirmPassword', formData.confirmPassword);
+    formDataToSend.append('gender', formData.gender);
+    formDataToSend.append('dateOfBirth', formData.dateOfBirth);
+    formDataToSend.append('country', formData.country);
+    formDataToSend.append('state', formData.state);
+    formDataToSend.append('address', formData.address);
+    formDataToSend.append('phone', formData.phone.trim());
+    formDataToSend.append('currency', formData.currency);
+    formDataToSend.append('otp', otp);
+    formDataToSend.append('idType', formData.idType);
+    
+    // IMPORTANT: Append the file - make sure it exists
+    if (!formData.idDocument) {
+      setError('Please upload an ID document');
+      return;
     }
+    formDataToSend.append('idDocument', formData.idDocument, formData.idDocument.name);
+    
+    // Append security questions as JSON string
+    formDataToSend.append('securityQuestions', JSON.stringify(formData.securityQuestions));
+
+    console.log('Sending registration data...');
+    console.log('ID Document:', formData.idDocument.name, formData.idDocument.type, formData.idDocument.size);
+
+    const response = await fetch(`${API_URL}/api/auth/register`, {
+      method: 'POST',
+      body: formDataToSend,
+      // DO NOT set Content-Type header - let the browser set it with boundary
+    });
+
+    const data = await response.json();
+    console.log('Registration response:', data);
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Registration failed');
+    }
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    onClose();
+    toast.success('Account created successfully!');
+    router.push('/dashboard');
+    console.log('Registration successful for user:', data.user.email);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
+    console.error('Signup error:', err);
+  }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
