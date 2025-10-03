@@ -7,7 +7,7 @@ export default function TermsPage() {
           These terms govern your use of ZenaTrust website and digital services.
         </p>
         <p>
-          By accessing our services, you agree to comply with these terms.
+          By accessing our services, you agree to comply with these terms, Thank you for choosing ZenaTrust.
         </p>
         <p>
           For terms-related questions: zenatrustbank@gmail.com.
