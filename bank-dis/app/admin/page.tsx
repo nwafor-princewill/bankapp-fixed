@@ -2,49 +2,18 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiUsers, FiDollarSign, FiCreditCard, FiSettings, FiCalendar, FiX, FiClock } from 'react-icons/fi';
+import { 
+  FiUsers, FiDollarSign, FiCreditCard, FiSettings, 
+  FiCalendar, FiX, FiClock, FiShield, FiTrash2, 
+  FiLock, FiUnlock, FiUser, FiArrowLeft, FiActivity, FiPlus
+} from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
-// Define types
-type Account = {
-  accountNumber: string;
-  balance: number;
-};
-
+type Account = { accountNumber: string; balance: number; };
 type User = {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  accounts: Account[];
-  isAdmin: boolean;
-  status: 'active' | 'blocked';
-};
-
-type Transaction = {
-  _id: string;
-  accountNumber: string;
-  amount: number;
-  type: string;
-  reference: string;
-  createdAt: string;
-  description: string;
-  userId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-  };
-};
-
-type ModificationHistory = {
-  date: Date;
-  changedBy: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  changes: Record<string, any>;
+  _id: string; firstName: string; lastName: string;
+  email: string; accounts: Account[]; isAdmin: boolean;
+  status: 'active' | 'blocked'; rewardPoints?: number;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -54,94 +23,46 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState<User[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    totalBalance: 0,
-    btcAddress: ''
-  });
-  const [creditForm, setCreditForm] = useState({
-    userEmail: '',
-    accountNumber: '',
+  const [stats, setStats] = useState({ totalUsers: 0, activeUsers: 0, totalBalance: 0, btcAddress: '' });
+  
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [forgeData, setForgeData] = useState({
     amount: '',
-    description: 'Admin credit'
+    type: 'deposit',
+    description: '',
+    date: new Date().toISOString().split('T')[0]
   });
-  const [newBtcAddress, setNewBtcAddress] = useState('');
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [newDate, setNewDate] = useState('');
-  const [showBackdateModal, setShowBackdateModal] = useState(false);
-  const [modificationHistory, setModificationHistory] = useState<ModificationHistory[]>([]);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  // NEW: Add password form state
-  const [passwordForm, setPasswordForm] = useState({
-    userId: '',
-    newPassword: '',
-  });
+
   const router = useRouter();
 
-  useEffect(() => {
-    checkAdminAccess();
-  }, []);
+  useEffect(() => { checkAdminAccess(); }, []);
 
   const checkAdminAccess = async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
+      if (!token) { router.push('/login'); return; }
       const response = await fetch(`${API_URL}/api/admin/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      if (response.status === 403) {
-        toast.error('Admin access required');
-        router.push('/dashboard');
-        return;
-      }
-
-      if (response.status === 401) {
-        toast.error('Please log in');
-        router.push('/login');
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error();
       setIsAdmin(true);
       fetchAdminData();
     } catch (err) {
-      console.error('Admin access check failed:', err);
-      toast.error('Failed to verify admin access');
       router.push('/dashboard');
-    } finally {
-      setIsLoading(false);
-    }
+    } finally { setIsLoading(false); }
   };
 
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('token');
-      
       const [statsRes, usersRes] = await Promise.all([
-        fetch(`${API_URL}/api/admin/stats`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/admin/users`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        fetch(`${API_URL}/api/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_URL}/api/admin/users`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
-      
-      if (!statsRes.ok) throw new Error(`Stats API failed: ${statsRes.status}`);
-      if (!usersRes.ok) throw new Error(`Users API failed: ${usersRes.status}`);
-      
       const statsData = await statsRes.json();
       const usersData = await usersRes.json();
-      
       setStats({
         totalUsers: statsData.users,
         activeUsers: statsData.activeUsers,
@@ -149,788 +70,392 @@ export default function AdminDashboard() {
         btcAddress: statsData.btcAddress
       });
       setUsers(usersData);
-      setNewBtcAddress(statsData.btcAddress);
-    } catch (err) {
-      console.error('Failed to load admin data:', err);
-      toast.error('Failed to load admin data: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
+    } catch (err) { toast.error('Failed to refresh data'); }
   };
 
-  const fetchTransactions = async (cacheBuster?: number) => {
-    try {
-      const token = localStorage.getItem('token');
-      const url = `${API_URL}/api/admin/transactions${cacheBuster ? `?t=${cacheBuster}` : ''}`;
-      
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store'
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch transactions');
-      
-      const data = await response.json();
-      setTransactions(data);
-    } catch (err) {
-      console.error('Failed to load transactions:', err);
-      toast.error('Failed to load transactions');
-    }
-  };
+  // --- POWER ACTIONS ---
 
-  const fetchModificationHistory = async (transactionId: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/transaction-history/${transactionId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch history');
-      
-      const data = await response.json();
-      setModificationHistory(data.history || []);
-      setShowHistoryModal(true);
-    } catch (err) {
-      console.error('Failed to load modification history:', err);
-      toast.error('Failed to load modification history');
-    }
-  };
-
-  const handleCreditSubmit = async (e: React.FormEvent) => {
+  const handleUniversalUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!selectedUser) return;
+    setIsSaving(true);
+    const formData = new FormData(e.currentTarget);
+    
+    // FIX: Checkbox sends "on" - convert to true boolean
+    const isAdminBool = formData.get('isAdmin') === 'on';
+
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/credit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(creditForm)
+      const response = await fetch(`${API_URL}/api/admin/update-user-360`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          userId: selectedUser._id,
+          updates: {
+            firstName: formData.get('firstName'),
+            lastName: formData.get('lastName'),
+            email: formData.get('email'),
+            isAdmin: isAdminBool
+          },
+          accountUpdates: [{
+            accountNumber: selectedUser.accounts[0]?.accountNumber,
+            newBalance: Number(formData.get('newBalance')),
+            description: formData.get('adjustmentLabel')
+          }]
+        })
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
-
-      toast.success(data.message);
-      setCreditForm({
-        userEmail: '',
-        accountNumber: '',
-        amount: '',
-        description: 'Admin credit'
-      });
-      fetchAdminData();
-    } catch (err) {
-      console.error('Credit failed:', err);
-      toast.error(err instanceof Error ? err.message : 'Credit failed');
-    }
+      if (response.ok) {
+        toast.success("User and Balance updated successfully");
+        setSelectedUser(null);
+        fetchAdminData();
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Update failed");
+      }
+    } catch (err) { toast.error("Update failed"); } 
+    finally { setIsSaving(false); }
   };
 
-  const toggleBlockUser = async (userId: string, currentlyBlocked: boolean) => {
+  // SECURITY CENTER ACTIONS
+  const handleSendResetLink = async (userId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/admin/reset-password-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ userId })
+      });
+      if (res.ok) toast.success("Reset link sent to user email");
+      else toast.error("Failed to send link");
+    } catch (err) { toast.error("Error connecting to server"); }
+  };
+
+  const handleManualPassword = async (userId: string) => {
+    const newPass = prompt("Enter new password for this user:");
+    if (!newPass) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/admin/manual-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ userId, newPassword: newPass })
+      });
+      if (res.ok) toast.success("Password updated successfully");
+      else toast.error("Update failed");
+    } catch (err) { toast.error("Error connecting to server"); }
+  };
+
+  const handleForgeTransaction = async () => {
+    if (!selectedUser) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/admin/forge-transaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          userId: selectedUser._id,
+          accountNumber: selectedUser.accounts[0].accountNumber,
+          ...forgeData
+        })
+      });
+      if (response.ok) {
+        toast.success("Transaction forged into history!");
+        setSelectedUser(null);
+        fetchAdminData();
+      }
+    } catch (err) { toast.error("Forge failed"); }
+  };
+
+  const toggleBlockUser = async (user: User) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/admin/block-user`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          userId,
-          block: !currentlyBlocked
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ userId: user._id, block: user.status !== 'blocked' })
       });
-
-      const data = await response.json();
       if (response.ok) {
-        toast.success(data.message);
-        setUsers(users.map(user => 
-          user._id === userId 
-            ? { ...user, status: currentlyBlocked ? 'active' : 'blocked' } 
-            : user
-        ));
-      } else {
-        throw new Error(data.message || 'Failed to update user status');
+        toast.success(`User ${user.status === 'blocked' ? 'unblocked' : 'blocked'}`);
+        fetchAdminData();
+        setSelectedUser(null);
       }
-    } catch (err) {
-      console.error('Block user failed:', err);
-      toast.error(err instanceof Error ? err.message : 'Operation failed');
-    }
+    } catch (err) { toast.error("Action failed"); }
   };
 
-  //delete user
   const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
-      return;
-    }
-
+    if (!confirm('Permanently delete this user? This cannot be undone.')) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/delete-user/${userId}`, {
+      const res = await fetch(`${API_URL}/api/admin/delete-user/${userId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(data.message);
-        setUsers(users.filter(user => user._id !== userId));
-      } else {
-        throw new Error(data.message || 'Failed to delete user');
+      if (res.ok) {
+        toast.success("User deleted");
+        setSelectedUser(null);
+        fetchAdminData();
       }
-    } catch (err) {
-      console.error('Delete user failed:', err);
-      toast.error(err instanceof Error ? err.message : 'Operation failed');
-    }
+    } catch (err) { toast.error("Delete failed"); }
   };
 
-  const deleteTransaction = async (transactionId: string) => {
-    if (!confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/delete-transaction/${transactionId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(data.message);
-        fetchTransactions(Date.now()); // Refresh transactions with cache buster
-      } else {
-        throw new Error(data.message || 'Failed to delete transaction');
-      }
-    } catch (err) {
-      console.error('Delete transaction failed:', err);
-      toast.error(err instanceof Error ? err.message : 'Operation failed');
-    }
-  };
-
-  const handleBtcUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/update-btc`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ newAddress: newBtcAddress })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
-
-      toast.success(data.message);
-      fetchAdminData();
-    } catch (err) {
-      console.error('BTC update failed:', err);
-      toast.error(err instanceof Error ? err.message : 'BTC address update failed');
-    }
-  };
-
-  const handleBackdateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/admin/backdate-transaction`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          transactionId: selectedTransaction?._id,
-          newDate: new Date(newDate).toISOString()
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
-
-      toast.success('Transaction date updated successfully');
-      setShowBackdateModal(false);
-      fetchTransactions(Date.now());
-    } catch (err) {
-      console.error('Backdate failed:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to backdate transaction');
-    }
-  };
-
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-
-  if (!isAdmin) {
-    return <div className="flex justify-center items-center h-screen">Access Denied</div>;
-  }
-
-  const BackdateTransactionModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-[#03305c]">Backdate Transaction</h2>
-          <button 
-            onClick={() => setShowBackdateModal(false)} 
-            className="text-gray-500 hover:text-[#e8742c]"
-          >
-            <FiX size={24} />
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <p className="font-medium">Reference: {selectedTransaction?.reference}</p>
-          <p>Amount: ${selectedTransaction?.amount?.toFixed(2)}</p>
-          <p>Current Date: {selectedTransaction?.createdAt ? new Date(selectedTransaction.createdAt).toLocaleString() : ''}</p>
-        </div>
-
-        <form onSubmit={handleBackdateSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">New Date</label>
-            <div className="relative">
-              <input
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                max={new Date().toISOString().split('T')[0]}
-                className="w-full p-2 border rounded pl-10"
-                required
-              />
-              <FiCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setShowBackdateModal(false)}
-              className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded text-white bg-[#03305c] hover:bg-[#e8742c]"
-            >
-              Update Date
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-
-  const HistoryModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Modification History</h2>
-          <button onClick={() => setShowHistoryModal(false)} className="text-gray-500 hover:text-red-500">
-            <FiX size={24} />
-          </button>
-        </div>
-        <div className="overflow-y-auto max-h-96">
-          <table className="min-w-full">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left">Date</th>
-                <th className="px-4 py-2 text-left">Changed By</th>
-                <th className="px-4 py-2 text-left">Changes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {modificationHistory.map((item, index) => (
-                <tr key={index} className="border-b">
-                  <td className="px-4 py-2">{new Date(item.date).toLocaleString()}</td>
-                  <td className="px-4 py-2">
-                    {item.changedBy?.firstName} {item.changedBy?.lastName}
-                  </td>
-                  <td className="px-4 py-2">
-                    <pre className="text-xs">{JSON.stringify(item.changes, null, 2)}</pre>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+  if (isLoading) return <div className="flex justify-center items-center h-screen font-bold">Initializing Command Center...</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-      
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded shadow">
-          <div className="flex items-center">
-            <FiUsers className="text-blue-500 mr-2" size={20} />
-            <span className="font-medium">Total Users</span>
-          </div>
-          <p className="text-2xl font-bold mt-2">{stats.totalUsers}</p>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-black text-[#03305c] tracking-tight">PRINCEWILL<span className="text-orange-500">.AI</span></h1>
+          <p className="text-gray-500 text-sm font-medium">Administrative Control Panel</p>
         </div>
-        
-        <div className="bg-white p-4 rounded shadow">
-          <div className="flex items-center">
-            <FiUsers className="text-green-500 mr-2" size={20} />
-            <span className="font-medium">Active Users</span>
+        <div className="hidden md:flex gap-4">
+          <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+            <p className="text-[10px] font-bold text-gray-400 uppercase">System Liquidity</p>
+            <p className="text-lg font-bold text-green-600">${stats.totalBalance.toLocaleString()}</p>
           </div>
-          <p className="text-2xl font-bold mt-2">{stats.activeUsers}</p>
-        </div>
-
-        <div className="bg-white p-4 rounded shadow">
-          <div className="flex items-center">
-            <FiDollarSign className="text-yellow-500 mr-2" size={20} />
-            <span className="font-medium">Total Balance</span>
-          </div>
-          <p className="text-2xl font-bold mt-2">${stats.totalBalance.toLocaleString()}</p>
-        </div>
-
-        <div className="bg-white p-4 rounded shadow">
-          <div className="flex items-center">
-            <FiCreditCard className="text-purple-500 mr-2" size={20} />
-            <span className="font-medium">BTC Address</span>
-          </div>
-          <p className="text-sm mt-2 break-all">{stats.btcAddress}</p>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex space-x-4 mb-6">
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded ${
-            activeTab === 'users' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          Users
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab('transactions');
-            fetchTransactions();
-          }}
-          className={`px-4 py-2 rounded ${
-            activeTab === 'transactions' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          Transactions
-        </button>
-        <button
-          onClick={() => setActiveTab('credit')}
-          className={`px-4 py-2 rounded ${
-            activeTab === 'credit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          Credit Account
-        </button>
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`px-4 py-2 rounded ${
-            activeTab === 'settings' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          <FiSettings className="inline mr-1" />
-          Settings
-        </button>
-        {/* NEW: Add Password Management Tab */}
-        <button
-          onClick={() => setActiveTab('passwords')}
-          className={`px-4 py-2 rounded ${
-            activeTab === 'passwords' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          Password Management
-        </button>
-      </div>
-
-      {/* Content */}
-      {activeTab === 'users' && (
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">All Users</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2">Name</th>
-                  <th className="text-left p-2">Email</th>
-                  <th className="text-left p-2">Account Numbers</th>
-                  <th className="text-left p-2">Total Balance</th>
-                  <th className="text-left p-2">Admin</th>
-                  <th className="text-left p-2">Status</th>
-                  <th className="text-left p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user._id} className="border-b hover:bg-gray-50">
-                    <td className="p-2">{user.firstName} {user.lastName}</td>
-                    <td className="p-2">{user.email}</td>
-                    <td className="p-2">
-                      {user.accounts?.length > 0 ? (
-                        <div className="space-y-1">
-                          {user.accounts.map((acc, idx) => (
-                            <div key={idx} className="text-sm">
-                              {acc.accountNumber}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">No accounts</span>
-                      )}
-                    </td>
-                    <td className="p-2">
-                      {user.accounts?.length > 0 ? (
-                        <div className="space-y-1">
-                          {user.accounts.map((acc, idx) => (
-                            <div key={idx} className="text-sm font-medium">
-                              ${acc.balance?.toLocaleString() || '0'}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">$0</span>
-                      )}
-                    </td>
-                    <td className="p-2">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        user.isAdmin ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {user.isAdmin ? 'Admin' : 'User'}
-                      </span>
-                    </td>
-                    <td className="p-2">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.status || 'active'}
-                      </span>
-                    </td>
-
-                    <td className="p-2 flex gap-2">
-                      <button
-                        onClick={() => toggleBlockUser(user._id, user.status === 'blocked')}
-                        className={`px-3 py-1 rounded text-white text-sm ${
-                          user.status === 'active' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
-                        }`}
-                      >
-                        {user.status === 'active' ? 'Block' : 'Unblock'}
-                      </button>
-                      <button
-                        onClick={() => deleteUser(user._id)}
-                        className="px-3 py-1 rounded text-white text-sm bg-red-700 hover:bg-red-800"
-                      >
-                        Delete
-                      </button>
-                    </td>
-
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'transactions' && (
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">All Transactions</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr className="bg-[#03305c] text-white">
-                  <th className="py-3 px-4 text-left">Date</th>
-                  <th className="py-3 px-4 text-left">User</th>
-                  <th className="py-3 px-4 text-left">Reference</th>
-                  <th className="py-3 px-4 text-left">Account</th>
-                  <th className="py-3 px-4 text-left">Amount</th>
-                  <th className="py-3 px-4 text-left">Type</th>
-                  <th className="py-3 px-4 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((txn) => (
-                  <tr key={txn._id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-4">{new Date(txn.createdAt).toLocaleString()}</td>
-                    <td className="py-3 px-4">{txn.userId?.firstName} {txn.userId?.lastName}</td>
-                    <td className="py-3 px-4">{txn.reference}</td>
-                    <td className="py-3 px-4">{txn.accountNumber}</td>
-                    <td className={`py-3 px-4 ${
-                      txn.amount >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      ${Math.abs(txn.amount).toFixed(2)}
-                    </td>
-                    <td className="py-3 px-4 capitalize">{txn.type}</td>
-                    
-                    <td className="py-3 px-4 flex">
-                      <button
-                        onClick={() => {
-                          setSelectedTransaction(txn);
-                          setNewDate(new Date(txn.createdAt).toISOString().split('T')[0]);
-                          setShowBackdateModal(true);
-                        }}
-                        className="text-[#03305c] hover:text-[#e8742c] p-1"
-                        title="Backdate transaction"
-                      >
-                        <FiCalendar size={18} />
-                      </button>
-                      <button
-                        onClick={() => fetchModificationHistory(txn._id)}
-                        className="text-blue-500 hover:text-blue-700 ml-2 p-1"
-                        title="View history"
-                      >
-                        <FiClock size={18} />
-                      </button>
-                      <button
-                        onClick={() => deleteTransaction(txn._id)}
-                        className="text-red-500 hover:text-red-700 ml-2 p-1"
-                        title="Delete transaction"
-                      >
-                        <FiX size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))} 
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'credit' && (
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">Credit User Account</h2>
-          <form onSubmit={handleCreditSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">User Email</label>
-              <input
-                type="email"
-                value={creditForm.userEmail}
-                onChange={(e) => setCreditForm({...creditForm, userEmail: e.target.value})}
-                className="w-full p-2 border rounded"
-                placeholder="user@example.com"
-                required
-              />
+      {!selectedUser ? (
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <FiUsers className="text-blue-500 mb-2" size={24} />
+              <p className="text-gray-500 text-xs font-bold uppercase">Total Users</p>
+              <p className="text-2xl font-black">{stats.totalUsers}</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Account Number</label>
-              <input
-                type="text"
-                value={creditForm.accountNumber}
-                onChange={(e) => setCreditForm({...creditForm, accountNumber: e.target.value})}
-                className="w-full p-2 border rounded"
-                placeholder="1234567890"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Amount ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={creditForm.amount}
-                onChange={(e) => setCreditForm({...creditForm, amount: e.target.value})}
-                className="w-full p-2 border rounded"
-                placeholder="100.00"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
-              <input
-                type="text"
-                value={creditForm.description}
-                onChange={(e) => setCreditForm({...creditForm, description: e.target.value})}
-                className="w-full p-2 border rounded"
-                placeholder="Admin credit adjustment"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Credit Account
-            </button>
-          </form>
-        </div>
-      )}
-
-      {activeTab === 'settings' && (
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">System Settings</h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium mb-3">Bitcoin Address Management</h3>
-              <form onSubmit={handleBtcUpdate} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Current BTC Address</label>
-                  <p className="text-sm text-gray-600 mb-2 p-2 bg-gray-50 rounded break-all">
-                    {stats.btcAddress}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">New BTC Address</label>
-                  <input
-                    type="text"
-                    value={newBtcAddress}
-                    onChange={(e) => setNewBtcAddress(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    placeholder="bc1q..."
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    This address will be shown to users for Bitcoin deposits
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                >
-                  Update BTC Address
-                </button>
-              </form>
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <FiActivity className="text-green-500 mb-2" size={24} />
+              <p className="text-gray-500 text-xs font-bold uppercase">Active</p>
+              <p className="text-2xl font-black">{stats.activeUsers}</p>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* NEW: Add Password Management Content */}
-      {activeTab === 'passwords' && (
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">Password Management</h2>
-          <div className="space-y-6">
-            {/* Change Password Form */}
-            <div>
-              <h3 className="text-lg font-medium mb-3">Change User Password</h3>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  try {
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${API_URL}/api/admin/change-password`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                      },
-                      body: JSON.stringify(passwordForm),
-                    });
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-50 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-[#03305c]">User Directory</h2>
+              <div className="flex gap-2">
+                 <button onClick={() => setActiveTab('users')} className={`px-4 py-2 rounded-full text-sm font-bold ${activeTab === 'users' ? 'bg-[#03305c] text-white' : 'bg-gray-100'}`}>Users</button>
+                 <button onClick={() => setActiveTab('settings')} className={`px-4 py-2 rounded-full text-sm font-bold ${activeTab === 'settings' ? 'bg-[#03305c] text-white' : 'bg-gray-100'}`}>Settings</button>
+              </div>
+            </div>
 
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.message);
-
-                    toast.success(data.message);
-                    setPasswordForm({ userId: '', newPassword: '' });
-                  } catch (err) {
-                    console.error('Change password failed:', err);
-                    toast.error(err instanceof Error ? err.message : 'Failed to change password');
-                  }
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <label className="block text-sm font-medium mb-1">Select User</label>
-                  <select
-                    value={passwordForm.userId}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, userId: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    required
-                  >
-                    <option value="">Select a user</option>
+            {activeTab === 'users' && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest">
+                      <th className="px-6 py-4">User Details</th>
+                      <th className="px-6 py-4">Primary Account</th>
+                      <th className="px-6 py-4">Current Balance</th>
+                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4 text-right">Control</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
                     {users.map((user) => (
-                      <option key={user._id} value={user._id}>
-                        {user.firstName} {user.lastName} ({user.email})
-                      </option>
+                      <tr key={user._id} className="hover:bg-blue-50/30 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#03305c] to-blue-400 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                              {user.firstName[0]}
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-900">{user.firstName} {user.lastName}</p>
+                              <p className="text-xs text-gray-500">{user.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-mono text-sm text-gray-600">{user.accounts[0]?.accountNumber || 'N/A'}</td>
+                        <td className="px-6 py-4">
+                          <p className="font-black text-gray-900">${user.accounts[0]?.balance.toLocaleString()}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {user.status || 'active'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button 
+                            onClick={() => setSelectedUser(user)}
+                            className="bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold text-[#03305c] hover:bg-[#03305c] hover:text-white transition-all shadow-sm"
+                          >
+                            Manage User
+                          </button>
+                        </td>
+                      </tr>
                     ))}
-                  </select>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="max-w-5xl mx-auto animate-in slide-in-from-right duration-300">
+          <button 
+            onClick={() => setSelectedUser(null)}
+            className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#03305c] mb-6 transition-colors"
+          >
+            <FiArrowLeft /> Back to Directory
+          </button>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="space-y-6">
+              <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center">
+                <div className="w-24 h-24 rounded-full bg-blue-100 text-[#03305c] flex items-center justify-center text-4xl font-black mx-auto mb-4 border-4 border-white shadow-lg">
+                  {selectedUser.firstName[0]}{selectedUser.lastName[0]}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">New Password</label>
-                  <input
-                    type="password"
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    placeholder="Enter new password"
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  Change Password
-                </button>
-              </form>
-            </div>
-
-            {/* Reset Password Form */}
-            <div>
-              <h3 className="text-lg font-medium mb-3">Reset User Password</h3>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  try {
-                    const token = localStorage.getItem('token');
-                    const response = await fetch(`${API_URL}/api/admin/reset-user-password`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                      },
-                      body: JSON.stringify({ userId: passwordForm.userId }),
-                    });
-
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.message);
-
-                    toast.success(data.message);
-                    setPasswordForm({ userId: '', newPassword: '' });
-                  } catch (err) {
-                    console.error('Reset password failed:', err);
-                    toast.error(err instanceof Error ? err.message : 'Failed to reset password');
-                  }
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <label className="block text-sm font-medium mb-1">Select User</label>
-                  <select
-                    value={passwordForm.userId}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, userId: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    required
+                <h2 className="text-2xl font-black text-gray-900">{selectedUser.firstName} {selectedUser.lastName}</h2>
+                <p className="text-gray-500 mb-6">{selectedUser.email}</p>
+                
+                <div className="flex flex-col gap-2">
+                  <button 
+                    onClick={() => toggleBlockUser(selectedUser)}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${selectedUser.status === 'blocked' ? 'bg-green-500 text-white' : 'bg-orange-100 text-orange-700 hover:bg-orange-200'}`}
                   >
-                    <option value="">Select a user</option>
-                    {users.map((user) => (
-                      <option key={user._id} value={user._id}>
-                        {user.firstName} {user.lastName} ({user.email})
-                      </option>
-                    ))}
-                  </select>
+                    {selectedUser.status === 'blocked' ? <><FiUnlock /> Unblock Account</> : <><FiLock /> Block Account</>}
+                  </button>
+                  <button 
+                    onClick={() => deleteUser(selectedUser._id)}
+                    className="flex items-center justify-center gap-2 py-3 rounded-xl font-bold bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                  >
+                    <FiTrash2 /> Terminate User
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              </div>
+
+              <div className="bg-[#03305c] p-6 rounded-3xl shadow-xl text-white">
+                <h3 className="font-bold flex items-center gap-2 mb-4"><FiShield className="text-orange-400"/> Security Center</h3>
+                <p className="text-xs text-blue-200 mb-4">Change user credentials or force password reset.</p>
+                <button 
+                  onClick={() => handleSendResetLink(selectedUser._id)}
+                  className="w-full bg-blue-500/20 border border-blue-400/30 py-2 rounded-lg text-sm font-bold hover:bg-blue-500/40 transition-all mb-2"
                 >
                   Send Reset Link
                 </button>
+                <button 
+                  onClick={() => handleManualPassword(selectedUser._id)}
+                  className="w-full bg-white text-[#03305c] py-2 rounded-lg text-sm font-bold hover:bg-blue-50"
+                >
+                  Set Manual Password
+                </button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 space-y-6">
+              <form onSubmit={handleUniversalUpdate} className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-black text-[#03305c]">Account Master Control</h3>
+                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
+                    <label className="text-xs font-bold text-gray-500">Admin Privileges</label>
+                    <input type="checkbox" name="isAdmin" defaultChecked={selectedUser.isAdmin} className="w-4 h-4 rounded text-[#03305c]" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">First Name</label>
+                    <input name="firstName" defaultValue={selectedUser.firstName} className="w-full p-3 bg-gray-50 border-none rounded-xl font-bold" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Last Name</label>
+                    <input name="lastName" defaultValue={selectedUser.lastName} className="w-full p-3 bg-gray-50 border-none rounded-xl font-bold" />
+                  </div>
+                </div>
+
+                <div className="bg-orange-50 border-2 border-orange-100 p-6 rounded-2xl mb-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <label className="text-orange-800 font-black text-sm uppercase tracking-tight">Overwrite Live Balance</label>
+                    <span className="bg-orange-200 text-orange-800 text-[10px] px-2 py-1 rounded font-bold italic underline">DANGEROUS ACTION</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl font-black text-orange-300">$</span>
+                    <input 
+                      name="newBalance" 
+                      type="number" 
+                      defaultValue={selectedUser.accounts[0]?.balance} 
+                      className="w-full bg-transparent text-4xl font-black text-orange-600 border-none focus:ring-0 p-0"
+                    />
+                  </div>
+                  <input 
+                    name="adjustmentLabel" 
+                    placeholder="Transaction Label (e.g. Balance Correction)" 
+                    className="w-full mt-4 p-2 text-xs bg-white/50 border-orange-200 border rounded-lg"
+                  />
+                </div>
+
+                <button 
+                  disabled={isSaving}
+                  className="w-full bg-[#03305c] text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-blue-200 transition-all hover:-translate-y-1"
+                >
+                  {isSaving ? "PROCESSING SYNC..." : "SYNC ALL CHANGES"}
+                </button>
               </form>
+
+              <div className="bg-gray-900 p-8 rounded-3xl shadow-2xl text-white">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-green-500/20 rounded-xl text-green-400"><FiPlus size={24}/></div>
+                  <div>
+                    <h3 className="text-xl font-black">History Forge</h3>
+                    <p className="text-xs text-gray-400 font-medium">Inject a transaction into the past.</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Amount ($)</label>
+                    <input 
+                      type="number" 
+                      placeholder="5000" 
+                      className="w-full bg-gray-800 border-gray-700 rounded-xl p-3 text-white font-bold"
+                      onChange={(e) => setForgeData({...forgeData, amount: e.target.value})}
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Type</label>
+                    <select 
+                      className="w-full bg-gray-800 border-gray-700 rounded-xl p-3 text-white font-bold appearance-none"
+                      onChange={(e) => setForgeData({...forgeData, type: e.target.value})}
+                    >
+                      <option value="deposit">Deposit</option>
+                      <option value="withdrawal">Withdrawal</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Description</label>
+                  <input 
+                    type="text" 
+                    placeholder="Wired via Swift" 
+                    className="w-full bg-gray-800 border-gray-700 rounded-xl p-3 text-white font-medium text-sm"
+                    onChange={(e) => setForgeData({...forgeData, description: e.target.value})}
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Backdate To</label>
+                  <input 
+                    type="date" 
+                    className="w-full bg-gray-800 border-gray-700 rounded-xl p-3 text-white font-bold"
+                    value={forgeData.date}
+                    onChange={(e) => setForgeData({...forgeData, date: e.target.value})}
+                  />
+                </div>
+
+                <button 
+                  onClick={handleForgeTransaction}
+                  className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-2xl font-black transition-all shadow-lg shadow-green-900/20"
+                >
+                  FORGE TRANSACTION
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-
-      {showBackdateModal && <BackdateTransactionModal />}
-      {showHistoryModal && <HistoryModal />}
     </div>
   );
 }
