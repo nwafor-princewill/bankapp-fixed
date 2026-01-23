@@ -4,9 +4,12 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
 
-// We no longer need the 'AuthenticatedRequest' interface here. It's been deleted.
+// Define a local interface to tell TypeScript that this request will have a user
+interface AuthRequest extends Request {
+  user?: any; // You can change 'any' to 'IUser' if you want stricter typing
+}
 
-const auth = async (req: Request, res: Response, next: NextFunction) => {
+const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
@@ -21,6 +24,8 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
     if (!user) {
       return res.status(401).send({ error: 'Authentication failed. User not found.' });
     }
+
+    // Now TypeScript will allow this because we are using AuthRequest
     req.user = user; 
     
     next();

@@ -25,7 +25,6 @@ export interface ICard {
   status: 'active' | 'locked' | 'lost';
 }
 
-// **FIX 1:** Define the shape of the notification preferences
 export interface INotificationPreferences {
   accountActivity: boolean;
   promotions: boolean;
@@ -42,6 +41,7 @@ export interface IUser extends Document {
   cards: ICard[];
   rewardPoints: number;
   isAdmin: boolean;
+  status: 'active' | 'blocked'; // ADDED THIS
   notificationPreferences?: INotificationPreferences; 
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
@@ -74,12 +74,11 @@ const cardSchema = new mongoose.Schema<ICard>({
   }
 });
 
-// **FIX 3:** Define the schema for the notification preferences
 const notificationPreferencesSchema = new mongoose.Schema<INotificationPreferences>({
   accountActivity: { type: Boolean, default: true },
   promotions: { type: Boolean, default: false },
   securityAlerts: { type: Boolean, default: true }
-}, { _id: false }); // Use _id: false as it's a subdocument
+}, { _id: false });
 
 const userSchema = new mongoose.Schema<IUser>({
   firstName: { type: String, required: true },
@@ -91,24 +90,28 @@ const userSchema = new mongoose.Schema<IUser>({
   cards: [cardSchema],
   rewardPoints: { type: Number, default: 1000, min: 0 },
   isAdmin: { type: Boolean, required: true, default: false },
+  status: { 
+    type: String, 
+    enum: ['active', 'blocked'], 
+    default: 'active' 
+  }, // ADDED THIS
   notificationPreferences: { type: notificationPreferencesSchema, default: () => ({}) }
 }, {
   timestamps: true
 });
 
-// Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
     next();
   }
-  
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Method to compare passwords
 userSchema.methods.matchPassword = async function(enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-export default mongoose.model<IUser>('User', userSchema);
+const User = mongoose.models.User as mongoose.Model<IUser> || mongoose.model<IUser>('User', userSchema);
+export default User;
+// export default mongoose.models.User || mongoose.model<IUser>('User', userSchema);

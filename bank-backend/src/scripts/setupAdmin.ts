@@ -30,18 +30,25 @@ const setupAdmin = async () => {
       console.log(`Updated existing user ${adminEmail} to admin`);
     } else {
       // Create new admin user
-      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      // Note: We don't hash here because the User model has a pre-save hook that hashes it
       
       const adminUser = new User({
         firstName: 'Admin',
         lastName: 'User',
         email: adminEmail,
-        password: hashedPassword,
+        password: adminPassword, // The pre-save hook in User.ts will hash this
         isAdmin: true,
-        phoneNumber: '1234567890',
-        dateOfBirth: new Date('1990-01-01'),
-        address: 'Admin Address',
-        accounts: []
+        rewardPoints: 1000,
+        // Provide a valid account object to satisfy validation and avoid unique null index error
+        accounts: [{
+            accountNumber: 'ADMIN-INTERNAL-001',
+            accountName: 'Admin Main Account',
+            balance: 0,
+            currency: 'USD',
+            openedAt: new Date()
+        }],
+        cryptoWallets: [],
+        cards: []
       });
 
       await adminUser.save();

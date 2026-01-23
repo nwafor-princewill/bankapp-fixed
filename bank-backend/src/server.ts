@@ -19,26 +19,21 @@ import serviceRequestRoutes from './routes/serviceRequestRoutes';
 import accountMaintenanceRoutes from './routes/accountMaintenanceRoutes';
 import adminRoutes from './routes/adminRoutes';
 
-
 dotenv.config();
 
 const app = express();
 
 // Middleware
-// app.use(cors());
-// With this:
 const allowedOrigins = [
-  'https://www.amalgamateed.com', // Your production domain
-  'https://amalgamateed.com', // Without www
-  'https://bank-dis.vercel.app', // Your frontend URL
-  'http://localhost:3000' // For local development
+  'https://www.amalgamateed.com',
+  'https://amalgamateed.com',
+  'https://bank-dis.vercel.app',
+  'http://localhost:3000'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -66,23 +61,17 @@ app.use('/api/beneficiaries', beneficiaryRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/service-requests', serviceRequestRoutes);
 app.use('/api/account-maintenance', accountMaintenanceRoutes);
-app.use('/api/admin', adminRoutes); // Make sure this line exists
+app.use('/api/admin', adminRoutes);
 
-// Start server
 const PORT = process.env.PORT || 5000;
 
+// Connect to Database and Start Server once
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-});
-
-// Add after DB connection
-connectDB().then(() => {
+  console.log('Database connected successfully');
   startBlockchainListener(); // Start the blockchain listener
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+}).catch(err => {
+  console.error('Failed to connect to the database:', err);
 });
-
-// Replace or complement your existing listener

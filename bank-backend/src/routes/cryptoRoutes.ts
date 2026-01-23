@@ -1,17 +1,23 @@
 // bank-backend/src/routes/cryptoRoutes.ts
 
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import auth from '../middleware/auth';
 import User from '../models/User';
 // Import the real CryptoTransaction model
 import CryptoTransaction from '../models/CryptoTransaction';
+
+// Define a local interface to tell TypeScript about the user property
+// This matches what your auth middleware attaches to the request
+interface AuthRequest extends Request {
+    user?: any;
+}
 
 const router = Router();
 
 // --- GET ROUTES (for reading data) ---
 
 // @route   GET /api/crypto/wallets
-router.get('/wallets', auth, async (req, res) => {
+router.get('/wallets', auth, async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findById(req.user?.id).select('cryptoWallets');
     if (!user) {
@@ -25,7 +31,7 @@ router.get('/wallets', auth, async (req, res) => {
 });
 
 // @route   GET /api/crypto/transactions
-router.get('/transactions', auth, async (req, res) => {
+router.get('/transactions', auth, async (req: AuthRequest, res: Response) => {
     try {
         const transactions = await CryptoTransaction.find({ userId: req.user?.id })
             .sort({ timestamp: -1 })
@@ -38,7 +44,7 @@ router.get('/transactions', auth, async (req, res) => {
 });
 
 // @route   GET /api/crypto/summary
-router.get('/summary', auth, async (req, res) => {
+router.get('/summary', auth, async (req: AuthRequest, res: Response) => {
     try {
         const user = await User.findById(req.user?.id);
         if (!user) {
@@ -62,7 +68,7 @@ router.get('/summary', auth, async (req, res) => {
 // --- POST ROUTES (for writing data) ---
 
 // @route   POST /api/crypto/wallets
-router.post('/wallets', auth, async (req, res) => {
+router.post('/wallets', auth, async (req: AuthRequest, res: Response) => {
     try {
         const { walletAddress, currency, label } = req.body;
         if (!walletAddress || !currency) {
@@ -88,7 +94,7 @@ router.post('/wallets', auth, async (req, res) => {
 // **NEW PRODUCTION-READY ROUTE**
 // @route   POST /api/crypto/transactions
 // @desc    Manually add a crypto transaction (e.g., for tracking external transfers)
-router.post('/transactions', auth, async (req, res) => {
+router.post('/transactions', auth, async (req: AuthRequest, res: Response) => {
     try {
         const { walletAddress, txid, amount, type, timestamp } = req.body;
 

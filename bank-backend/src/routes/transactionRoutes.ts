@@ -1,12 +1,17 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import auth from '../middleware/auth';
 import BankTransaction from '../models/BankTransaction';
 import mongoose from 'mongoose';
 
+// Define the local interface for this file
+interface AuthRequest extends Request {
+  user?: any;
+}
+
 const router = Router();
 
 // Get transactions with pagination
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, async (req: AuthRequest, res: Response) => {
   try {
     const { page = 1, limit = 10, type, startDate, endDate, accountNumber } = req.query;
     
@@ -59,7 +64,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Create a new transaction
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, async (req: AuthRequest, res: Response) => {
   try {
     const { accountNumber, amount, type, description, balanceAfter, recipientAccount, reference } = req.body;
 

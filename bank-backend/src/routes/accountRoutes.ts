@@ -1,11 +1,16 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import auth from '../middleware/auth';
 import { getAccountSummary } from '../services/accountService';
+
+// Local interface for this file
+interface AuthRequest extends Request {
+    user?: any;
+}
 
 const router = Router();
 
 // @route   GET /api/accounts/summary
-router.get('/summary', auth, async (req, res) => {
+router.get('/summary', auth, async (req: AuthRequest, res: Response) => {
   try {
     // Add validation
     if (!req.user?.id) {
