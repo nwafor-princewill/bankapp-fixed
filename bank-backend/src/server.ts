@@ -25,8 +25,8 @@ const app = express();
 
 // Middleware
 const allowedOrigins = [
-  'https://www.amalgamateed.com',
-  'https://amalgamateed.com',
+  'https://www.zenatrust.com',
+  'https://zenatrust.com',
   'https://bank-dis.vercel.app',
   'http://localhost:3000'
 ];
