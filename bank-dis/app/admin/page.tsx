@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -28,12 +27,22 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Forge transaction state
   const [forgeData, setForgeData] = useState({
     amount: '',
     type: 'deposit',
     description: '',
     date: new Date().toISOString().split('T')[0]
   });
+
+  // Settings tab state
+  const [btcAddressInput, setBtcAddressInput] = useState('');
+  const [isUpdatingBtc, setIsUpdatingBtc] = useState(false);
+
+  // Loading states for security actions
+  const [isSendingReset, setIsSendingReset] = useState(false);
+  const [isSettingPassword, setIsSettingPassword] = useState(false);
+  const [isForging, setIsForging] = useState(false);
 
   const router = useRouter();
 
@@ -69,6 +78,7 @@ export default function AdminDashboard() {
         totalBalance: statsData.totalBalance || 0,
         btcAddress: statsData.btcAddress
       });
+      setBtcAddressInput(statsData.btcAddress || '');
       setUsers(usersData);
     } catch (err) { toast.error('Failed to refresh data'); }
   };
@@ -119,6 +129,7 @@ export default function AdminDashboard() {
 
   // SECURITY CENTER ACTIONS
   const handleSendResetLink = async (userId: string) => {
+    setIsSendingReset(true);
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/admin/reset-password-link`, {
@@ -126,15 +137,18 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ userId })
       });
+      const data = await res.json();
       if (res.ok) toast.success("Reset link sent to user email");
-      else toast.error("Failed to send link");
-    } catch (err) { toast.error("Error connecting to server"); }
+      else toast.error(data.message || "Failed to send link");
+    } catch (err) { toast.error("Error connecting to server"); } 
+    finally { setIsSendingReset(false); }
   };
 
   const handleManualPassword = async (userId: string) => {
     const newPass = prompt("Enter new password for this user:");
     if (!newPass) return;
     
+    setIsSettingPassword(true);
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/admin/manual-password`, {
@@ -142,13 +156,16 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ userId, newPassword: newPass })
       });
+      const data = await res.json();
       if (res.ok) toast.success("Password updated successfully");
-      else toast.error("Update failed");
-    } catch (err) { toast.error("Error connecting to server"); }
+      else toast.error(data.message || "Update failed");
+    } catch (err) { toast.error("Error connecting to server"); } 
+    finally { setIsSettingPassword(false); }
   };
 
   const handleForgeTransaction = async () => {
     if (!selectedUser) return;
+    setIsForging(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/admin/forge-transaction`, {
@@ -160,12 +177,16 @@ export default function AdminDashboard() {
           ...forgeData
         })
       });
+      const data = await response.json();
       if (response.ok) {
         toast.success("Transaction forged into history!");
         setSelectedUser(null);
         fetchAdminData();
+      } else {
+        toast.error(data.message || "Forge failed");
       }
-    } catch (err) { toast.error("Forge failed"); }
+    } catch (err) { toast.error("Forge failed"); } 
+    finally { setIsForging(false); }
   };
 
   const toggleBlockUser = async (user: User) => {
@@ -176,10 +197,13 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ userId: user._id, block: user.status !== 'blocked' })
       });
+      const data = await response.json();
       if (response.ok) {
         toast.success(`User ${user.status === 'blocked' ? 'unblocked' : 'blocked'}`);
         fetchAdminData();
         setSelectedUser(null);
+      } else {
+        toast.error(data.message || "Action failed");
       }
     } catch (err) { toast.error("Action failed"); }
   };
@@ -192,12 +216,47 @@ export default function AdminDashboard() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      const data = await res.json();
       if (res.ok) {
         toast.success("User deleted");
         setSelectedUser(null);
         fetchAdminData();
+      } else {
+        toast.error(data.message || "Delete failed");
       }
     } catch (err) { toast.error("Delete failed"); }
+  };
+
+  // BTC Address update handler
+  const handleUpdateBtcAddress = async () => {
+    if (!btcAddressInput.trim()) {
+      toast.error('Please enter a BTC address');
+      return;
+    }
+    setIsUpdatingBtc(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/admin/update-btc`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ newAddress: btcAddressInput })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('BTC address updated');
+        setStats(prev => ({ ...prev, btcAddress: btcAddressInput }));
+        // Optionally clear input or keep it as the new address
+      } else {
+        toast.error(data.message || 'Update failed');
+      }
+    } catch (err) {
+      toast.error('Error updating BTC address');
+    } finally {
+      setIsUpdatingBtc(false);
+    }
   };
 
   if (isLoading) return <div className="flex justify-center items-center h-screen font-bold">Initializing Command Center...</div>;
@@ -290,6 +349,32 @@ export default function AdminDashboard() {
                 </table>
               </div>
             )}
+
+            {activeTab === 'settings' && (
+              <div className="p-6">
+                <h3 className="text-lg font-bold text-[#03305c] mb-4">System Settings</h3>
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 max-w-md">
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Bitcoin Deposit Address</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={btcAddressInput}
+                      onChange={(e) => setBtcAddressInput(e.target.value)}
+                      placeholder="Enter BTC address"
+                      className="flex-1 p-3 border border-gray-200 rounded-xl font-mono text-sm"
+                    />
+                    <button
+                      onClick={handleUpdateBtcAddress}
+                      disabled={isUpdatingBtc}
+                      className="bg-[#03305c] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#e8742c] transition-colors disabled:opacity-50"
+                    >
+                      {isUpdatingBtc ? 'Saving...' : 'Update'}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">Current: <span className="font-mono">{stats.btcAddress}</span></p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -331,15 +416,17 @@ export default function AdminDashboard() {
                 <p className="text-xs text-blue-200 mb-4">Change user credentials or force password reset.</p>
                 <button 
                   onClick={() => handleSendResetLink(selectedUser._id)}
-                  className="w-full bg-blue-500/20 border border-blue-400/30 py-2 rounded-lg text-sm font-bold hover:bg-blue-500/40 transition-all mb-2"
+                  disabled={isSendingReset}
+                  className="w-full bg-blue-500/20 border border-blue-400/30 py-2 rounded-lg text-sm font-bold hover:bg-blue-500/40 transition-all mb-2 disabled:opacity-50"
                 >
-                  Send Reset Link
+                  {isSendingReset ? 'Sending...' : 'Send Reset Link'}
                 </button>
                 <button 
                   onClick={() => handleManualPassword(selectedUser._id)}
-                  className="w-full bg-white text-[#03305c] py-2 rounded-lg text-sm font-bold hover:bg-blue-50"
+                  disabled={isSettingPassword}
+                  className="w-full bg-white text-[#03305c] py-2 rounded-lg text-sm font-bold hover:bg-blue-50 disabled:opacity-50"
                 >
-                  Set Manual Password
+                  {isSettingPassword ? 'Setting...' : 'Set Manual Password'}
                 </button>
               </div>
             </div>
@@ -365,6 +452,18 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                {/* NEW: Email field */}
+                <div className="mb-6">
+                  <label className="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Email Address</label>
+                  <input 
+                    name="email" 
+                    type="email"
+                    defaultValue={selectedUser.email} 
+                    className="w-full p-3 bg-gray-50 border-none rounded-xl font-bold"
+                    required
+                  />
+                </div>
+
                 <div className="bg-orange-50 border-2 border-orange-100 p-6 rounded-2xl mb-6">
                   <div className="flex justify-between items-center mb-4">
                     <label className="text-orange-800 font-black text-sm uppercase tracking-tight">Overwrite Live Balance</label>
@@ -388,7 +487,7 @@ export default function AdminDashboard() {
 
                 <button 
                   disabled={isSaving}
-                  className="w-full bg-[#03305c] text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-blue-200 transition-all hover:-translate-y-1"
+                  className="w-full bg-[#03305c] text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-blue-200 transition-all hover:-translate-y-1 disabled:opacity-50"
                 >
                   {isSaving ? "PROCESSING SYNC..." : "SYNC ALL CHANGES"}
                 </button>
@@ -447,9 +546,10 @@ export default function AdminDashboard() {
 
                 <button 
                   onClick={handleForgeTransaction}
-                  className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-2xl font-black transition-all shadow-lg shadow-green-900/20"
+                  disabled={isForging}
+                  className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-2xl font-black transition-all shadow-lg shadow-green-900/20 disabled:opacity-50"
                 >
-                  FORGE TRANSACTION
+                  {isForging ? 'FORGING...' : 'FORGE TRANSACTION'}
                 </button>
               </div>
             </div>
