@@ -9,7 +9,7 @@
     "build": "tsc",
     "setup-admin": "ts-node src/scripts/setupAdmin.ts",
     "setup-admin-prod": "node dist/scripts/setupAdmin.js",
-    "postbuild": "npm run_setup-admin-prod"
+    "postbuild": "npm run setup-admin-prod"
   },
   "keywords": [],
   "author": "",
