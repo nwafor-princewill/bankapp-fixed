@@ -49,16 +49,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     state: '',
     address: '',
     currency: 'USD',
-    // securityQuestions: [
-    //   { question: '', answer: '' },
-    //   { question: '', answer: '' }
-    // ],
     securityQuestions: [
-      { question: SECURITY_QUESTIONS[0], answer: '' }, // Initialize with default question
-      { question: SECURITY_QUESTIONS[1], answer: '' }  // Initialize with default question
+      { question: SECURITY_QUESTIONS[0], answer: '' },
+      { question: SECURITY_QUESTIONS[1], answer: '' }
     ],
-    idType: '', // NEW: ID type
-    idDocument: null as File | null // NEW: ID document file
+    idType: '',
+    idDocument: null as File | null
   });
   const [loginData, setLoginData] = useState({
     email: '',
@@ -74,6 +70,11 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
+  
+  // Loading states
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   useEffect(() => {
     if (showSignup) {
@@ -168,15 +169,18 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSendingOtp(true);
 
     const emailValidation = validateEmailWithSuggestions(formData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
+      setIsSendingOtp(false);
       return;
     }
 
     if (!formData.firstName.trim()) {
       setError('First name is required to send OTP');
+      setIsSendingOtp(false);
       return;
     }
 
@@ -204,30 +208,37 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send OTP. Please try again.');
       console.error('Send OTP error:', err);
+    } finally {
+      setIsSendingOtp(false);
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSigningUp(true);
 
     if (!otp.trim()) {
       setError('Please enter the OTP sent to your email');
+      setIsSigningUp(false);
       return;
     }
 
     if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
       setError('Please enter a valid 6-digit OTP');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.idType) {
       setError('Please select an ID type');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.idDocument) {
       setError('Please upload an ID document');
+      setIsSigningUp(false);
       return;
     }
 
@@ -237,63 +248,75 @@ const AuthModals: React.FC<AuthModalsProps> = ({
 
     if (incompleteQuestions) {
       setError('Please complete all security questions');
+      setIsSigningUp(false);
       return;
     }
 
     const emailValidation = validateEmailWithSuggestions(formData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.firstName.trim()) {
       setError('First name is required');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.lastName.trim()) {
       setError('Last name is required');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.phone.trim()) {
       setError('Phone number is required');
+      setIsSigningUp(false);
       return;
     }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
+      setIsSigningUp(false);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.dateOfBirth) {
       setError('Date of birth is required');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.country) {
       setError('Country is required');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.state) {
       setError('State/Province is required');
+      setIsSigningUp(false);
       return;
     }
 
     if (!formData.address) {
       setError('Address is required');
+      setIsSigningUp(false);
       return;
     }
 
     for (let i = 0; i < formData.securityQuestions.length; i++) {
       if (!formData.securityQuestions[i].question || !formData.securityQuestions[i].answer) {
         setError('Please complete all security questions');
+        setIsSigningUp(false);
         return;
       }
     }
@@ -301,7 +324,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
    try {
     const formDataToSend = new FormData();
     
-    // Append all text fields
     formDataToSend.append('firstName', formData.firstName.trim());
     formDataToSend.append('lastName', formData.lastName.trim());
     formDataToSend.append('email', formData.email.trim().toLowerCase());
@@ -317,14 +339,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     formDataToSend.append('otp', otp);
     formDataToSend.append('idType', formData.idType);
     
-    // IMPORTANT: Append the file - make sure it exists
     if (!formData.idDocument) {
       setError('Please upload an ID document');
+      setIsSigningUp(false);
       return;
     }
     formDataToSend.append('idDocument', formData.idDocument, formData.idDocument.name);
-    
-    // Append security questions as JSON string
     formDataToSend.append('securityQuestions', JSON.stringify(formData.securityQuestions));
 
     console.log('Sending registration data...');
@@ -333,7 +353,6 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     const response = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       body: formDataToSend,
-      // DO NOT set Content-Type header - let the browser set it with boundary
     });
 
     const data = await response.json();
@@ -353,16 +372,20 @@ const AuthModals: React.FC<AuthModalsProps> = ({
   } catch (err) {
     setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     console.error('Signup error:', err);
+  } finally {
+    setIsSigningUp(false);
   }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoggingIn(true);
 
     const emailValidation = validateEmailWithSuggestions(loginData.email);
     if (!emailValidation.isValid) {
       setError(emailValidation.message || 'Invalid email format');
+      setIsLoggingIn(false);
       return;
     }
 
@@ -393,6 +416,8 @@ const AuthModals: React.FC<AuthModalsProps> = ({
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
       console.error('Login error:', err);
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -557,9 +582,10 @@ const AuthModals: React.FC<AuthModalsProps> = ({
             </div>
             <button
               type="submit"
-              className="w-full bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:ring-offset-2"
+              disabled={isLoggingIn}
+              className="w-full bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Continue
+              {isLoggingIn ? 'Logging in...' : 'Continue'}
             </button>
           </form>
         ) : null}
@@ -599,9 +625,10 @@ const AuthModals: React.FC<AuthModalsProps> = ({
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:ring-offset-2"
+                disabled={isSendingOtp}
+                className="w-full bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send OTP
+                {isSendingOtp ? 'Sending OTP...' : 'Send OTP'}
               </button>
             </form>
           ) : (
@@ -929,14 +956,16 @@ const AuthModals: React.FC<AuthModalsProps> = ({
                     setOtp('');
                   }}
                   className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
+                  disabled={isSigningUp}
                 >
                   Back
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#03305c] focus:ring-offset-2"
+                  disabled={isSigningUp}
+                  className="flex-1 bg-[#03305c] text-white py-2 px-4 rounded-md hover:bg-[#e8742c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Open Account
+                  {isSigningUp ? 'Creating Account...' : 'Open Account'}
                 </button>
               </div>
             </form>

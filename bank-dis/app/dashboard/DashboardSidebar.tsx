@@ -83,51 +83,6 @@ const DashboardSidebar = () => {
     }
   };
 
-  /* useEffect(() => {
-    const checkPinStatus = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/api/users/pin-status`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          setHasTransferPin(data.hasPin);
-        }
-      } catch (error) {
-        console.error('Error checking PIN status:', error);
-      }
-    };
-    
-    checkPinStatus();
-  }, []); */
-
-  /* const handleSetPin = async (pin: string): Promise<void> => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/api/users/set-pin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ pin })
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to set PIN');
-      }
-      
-      setHasTransferPin(true);
-      toast.success('Transfer PIN set successfully');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to set PIN');
-      throw error;
-    }
-  }; */
-
   return (
     <>
       {/* Mobile Menu Button */}
