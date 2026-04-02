@@ -265,7 +265,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-black text-[#03305c] tracking-tight">PRINCEWILL<span className="text-orange-500">.AI</span></h1>
+          <h1 className="text-3xl font-black text-[#03305c] tracking-tight">FOCUS<span className="text-orange-500">.AI</span></h1>
           <p className="text-gray-500 text-sm font-medium">Administrative Control Panel</p>
         </div>
         <div className="hidden md:flex gap-4">
