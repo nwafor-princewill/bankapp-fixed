@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiSettings, FiHelpCircle, FiShield, FiExternalLink, FiMenu, FiX, FiHome } from 'react-icons/fi';
+import { FiSettings, FiHelpCircle, FiShield, FiExternalLink, FiMenu, FiX, FiHome, FiUser } from 'react-icons/fi';
 import { MdAccountBalance, MdPayment, MdReceipt, MdPeople, MdBuild, MdCreditCard } from 'react-icons/md';
 import { FaMoneyBillWave, FaPiggyBank } from 'react-icons/fa';
 import { MdSettingsApplications } from 'react-icons/md';
@@ -26,6 +26,7 @@ const menuItems = [
   { id: 'card-management', label: 'Card Management', icon: <MdCreditCard size={20} />, path: '/dashboard/transactions/card' },
   { id: 'beneficiaries', label: 'Beneficiary Management', icon: <MdPeople size={20} />, path: '/dashboard/beneficiaries' },
   { id: 'loans', label: 'Loans and Investments', icon: <FaPiggyBank size={20} />, path: '/dashboard/loans' },
+  { id: 'profile', label: 'My Profile', icon: <FiUser size={20} />, path: '/dashboard/profile' },
   { id: 'service-requests', label: 'Service Requests', icon: <MdBuild size={20} />, path: '/dashboard/service-requests' },
 ];
 
