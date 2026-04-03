@@ -10,7 +10,8 @@ import { toast } from 'react-toastify';
 type Account = { accountNumber: string; balance: number; };
 type User = {
   _id: string; firstName: string; lastName: string;
-  email: string; accounts: Account[]; isAdmin: boolean;
+  email: string; phone?: string;  // Added phone
+  accounts: Account[]; isAdmin: boolean;
   status: 'active' | 'blocked';
 };
 
@@ -359,9 +360,10 @@ export default function AdminDashboard() {
                   <thead>
                     <tr className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest">
                       <th className="px-6 py-4">User Details</th>
+                      <th className="px-6 py-4 hidden md:table-cell">Phone</th>
                       <th className="px-6 py-4">Primary Account</th>
                       <th className="px-6 py-4">Current Balance</th>
-                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4 hidden lg:table-cell">Status</th>
                       <th className="px-6 py-4 text-right">Control</th>
                     </tr>
                   </thead>
@@ -376,14 +378,16 @@ export default function AdminDashboard() {
                             <div>
                               <p className="font-bold text-gray-900">{user.firstName} {user.lastName}</p>
                               <p className="text-xs text-gray-500">{user.email}</p>
+                              <p className="text-xs text-gray-500 md:hidden">{user.phone || 'No phone'}</p> {/* Show phone on mobile */}
                             </div>
                           </div>
                         </td>
+                        <td className="px-6 py-4 hidden md:table-cell text-gray-600">{user.phone || 'N/A'}</td>
                         <td className="px-6 py-4 font-mono text-sm text-gray-600">{user.accounts[0]?.accountNumber || 'N/A'}</td>
                         <td className="px-6 py-4">
                           <p className="font-black text-gray-900">${user.accounts[0]?.balance.toLocaleString()}</p>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 hidden lg:table-cell">
                           <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {user.status || 'active'}
                           </span>
@@ -399,7 +403,7 @@ export default function AdminDashboard() {
                             Manage User
                           </button>
                         </td>
-                      </tr>
+                       </tr>
                     ))}
                   </tbody>
                 </table>
@@ -450,7 +454,8 @@ export default function AdminDashboard() {
                   {selectedUser.firstName[0]}{selectedUser.lastName[0]}
                 </div>
                 <h2 className="text-2xl font-black text-gray-900">{selectedUser.firstName} {selectedUser.lastName}</h2>
-                <p className="text-gray-500 mb-6">{selectedUser.email}</p>
+                <p className="text-gray-500 mb-2">{selectedUser.email}</p>
+                <p className="text-gray-500 mb-6">📞 {selectedUser.phone || 'No phone number'}</p>
                 
                 <div className="flex flex-col gap-2">
                   <button 
@@ -518,6 +523,16 @@ export default function AdminDashboard() {
                     defaultValue={selectedUser.email} 
                     className="w-full p-3 bg-gray-50 border-none rounded-xl font-bold"
                     required
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Phone Number</label>
+                  <input 
+                    name="phone" 
+                    type="tel"
+                    defaultValue={selectedUser.phone || ''} 
+                    className="w-full p-3 bg-gray-50 border-none rounded-xl font-bold"
                   />
                 </div>
 
