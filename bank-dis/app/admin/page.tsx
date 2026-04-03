@@ -2,9 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  FiUsers, FiDollarSign, FiCreditCard, FiSettings, 
-  FiCalendar, FiX, FiClock, FiShield, FiTrash2, 
-  FiLock, FiUnlock, FiUser, FiArrowLeft, FiActivity, FiPlus
+  FiUsers, FiActivity, FiShield, FiTrash2, 
+  FiLock, FiUnlock, FiArrowLeft, FiPlus, FiEdit2, FiX
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
@@ -12,7 +11,18 @@ type Account = { accountNumber: string; balance: number; };
 type User = {
   _id: string; firstName: string; lastName: string;
   email: string; accounts: Account[]; isAdmin: boolean;
-  status: 'active' | 'blocked'; rewardPoints?: number;
+  status: 'active' | 'blocked';
+};
+
+type Transaction = {
+  _id: string;
+  reference: string;
+  amount: number;
+  type: 'deposit' | 'withdrawal' | 'transfer';
+  description: string;
+  createdAt: string;
+  status: string;
+  balanceAfter: number;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -25,6 +35,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ totalUsers: 0, activeUsers: 0, totalBalance: 0, btcAddress: '' });
   
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [userTransactions, setUserTransactions] = useState<Transaction[]>([]);
+  const [isLoadingTx, setIsLoadingTx] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Forge transaction state
@@ -34,6 +46,16 @@ export default function AdminDashboard() {
     description: '',
     date: new Date().toISOString().split('T')[0]
   });
+
+  // Backdate modal state
+  const [showBackdateModal, setShowBackdateModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [backdateData, setBackdateData] = useState({
+    newDate: '',
+    newDescription: '',
+    adminNote: ''
+  });
+  const [isBackdating, setIsBackdating] = useState(false);
 
   // Settings tab state
   const [btcAddressInput, setBtcAddressInput] = useState('');
@@ -83,15 +105,25 @@ export default function AdminDashboard() {
     } catch (err) { toast.error('Failed to refresh data'); }
   };
 
-  // --- POWER ACTIONS ---
+  const fetchUserTransactions = async (userId: string) => {
+    setIsLoadingTx(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/admin/users/${userId}/transactions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) setUserTransactions(data.transactions);
+      else toast.error('Failed to load transactions');
+    } catch (err) { toast.error('Error loading transactions'); }
+    finally { setIsLoadingTx(false); }
+  };
 
   const handleUniversalUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedUser) return;
     setIsSaving(true);
     const formData = new FormData(e.currentTarget);
-    
-    // FIX: Checkbox sends "on" - convert to true boolean
     const isAdminBool = formData.get('isAdmin') === 'on';
 
     try {
@@ -127,7 +159,6 @@ export default function AdminDashboard() {
     finally { setIsSaving(false); }
   };
 
-  // SECURITY CENTER ACTIONS
   const handleSendResetLink = async (userId: string) => {
     setIsSendingReset(true);
     try {
@@ -147,7 +178,6 @@ export default function AdminDashboard() {
   const handleManualPassword = async (userId: string) => {
     const newPass = prompt("Enter new password for this user:");
     if (!newPass) return;
-    
     setIsSettingPassword(true);
     try {
       const token = localStorage.getItem('token');
@@ -179,14 +209,43 @@ export default function AdminDashboard() {
       });
       const data = await response.json();
       if (response.ok) {
-        toast.success("Transaction forged into history!");
-        setSelectedUser(null);
+        toast.success("Transaction forged!");
+        fetchUserTransactions(selectedUser._id);
         fetchAdminData();
       } else {
         toast.error(data.message || "Forge failed");
       }
     } catch (err) { toast.error("Forge failed"); } 
     finally { setIsForging(false); }
+  };
+
+  const handleBackdate = async () => {
+    if (!selectedTransaction) return;
+    setIsBackdating(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/admin/backdate-transaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          transactionId: selectedTransaction._id,
+          newDate: backdateData.newDate,
+          newDescription: backdateData.newDescription || undefined,
+          adminNote: backdateData.adminNote || undefined
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Transaction backdated");
+        setShowBackdateModal(false);
+        fetchUserTransactions(selectedUser!._id);
+        setSelectedTransaction(null);
+        setBackdateData({ newDate: '', newDescription: '', adminNote: '' });
+      } else {
+        toast.error(data.message || "Backdate failed");
+      }
+    } catch (err) { toast.error("Backdate failed"); }
+    finally { setIsBackdating(false); }
   };
 
   const toggleBlockUser = async (user: User) => {
@@ -201,7 +260,9 @@ export default function AdminDashboard() {
       if (response.ok) {
         toast.success(`User ${user.status === 'blocked' ? 'unblocked' : 'blocked'}`);
         fetchAdminData();
-        setSelectedUser(null);
+        if (selectedUser?._id === user._id) {
+          setSelectedUser(null);
+        }
       } else {
         toast.error(data.message || "Action failed");
       }
@@ -227,7 +288,6 @@ export default function AdminDashboard() {
     } catch (err) { toast.error("Delete failed"); }
   };
 
-  // BTC Address update handler
   const handleUpdateBtcAddress = async () => {
     if (!btcAddressInput.trim()) {
       toast.error('Please enter a BTC address');
@@ -238,25 +298,18 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/admin/update-btc`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ newAddress: btcAddressInput })
       });
       const data = await res.json();
       if (res.ok) {
         toast.success('BTC address updated');
         setStats(prev => ({ ...prev, btcAddress: btcAddressInput }));
-        // Optionally clear input or keep it as the new address
       } else {
         toast.error(data.message || 'Update failed');
       }
-    } catch (err) {
-      toast.error('Error updating BTC address');
-    } finally {
-      setIsUpdatingBtc(false);
-    }
+    } catch (err) { toast.error('Error updating BTC address'); }
+    finally { setIsUpdatingBtc(false); }
   };
 
   if (isLoading) return <div className="flex justify-center items-center h-screen font-bold">Initializing Command Center...</div>;
@@ -277,7 +330,7 @@ export default function AdminDashboard() {
       </div>
 
       {!selectedUser ? (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
               <FiUsers className="text-blue-500 mb-2" size={24} />
@@ -337,7 +390,10 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <button 
-                            onClick={() => setSelectedUser(user)}
+                            onClick={() => {
+                              setSelectedUser(user);
+                              fetchUserTransactions(user._id);
+                            }}
                             className="bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold text-[#03305c] hover:bg-[#03305c] hover:text-white transition-all shadow-sm"
                           >
                             Manage User
@@ -378,7 +434,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       ) : (
-        <div className="max-w-5xl mx-auto animate-in slide-in-from-right duration-300">
+        <div className="max-w-7xl mx-auto animate-in slide-in-from-right duration-300">
           <button 
             onClick={() => setSelectedUser(null)}
             className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#03305c] mb-6 transition-colors"
@@ -387,6 +443,7 @@ export default function AdminDashboard() {
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - User Info & Security */}
             <div className="space-y-6">
               <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center">
                 <div className="w-24 h-24 rounded-full bg-blue-100 text-[#03305c] flex items-center justify-center text-4xl font-black mx-auto mb-4 border-4 border-white shadow-lg">
@@ -431,6 +488,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* Right Column - Account Control & Transactions */}
             <div className="lg:col-span-2 space-y-6">
               <form onSubmit={handleUniversalUpdate} className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
                 <div className="flex justify-between items-center mb-6">
@@ -452,7 +510,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* NEW: Email field */}
                 <div className="mb-6">
                   <label className="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Email Address</label>
                   <input 
@@ -493,6 +550,63 @@ export default function AdminDashboard() {
                 </button>
               </form>
 
+              {/* Transaction History Section */}
+              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                  <h3 className="text-xl font-black text-[#03305c]">Transaction History</h3>
+                  <button
+                    onClick={() => fetchUserTransactions(selectedUser._id)}
+                    className="text-sm text-[#03305c] hover:text-[#e8742c] font-bold"
+                  >
+                    Refresh
+                  </button>
+                </div>
+                <div className="p-4">
+                  {isLoadingTx ? (
+                    <p className="text-center py-8 text-gray-500">Loading transactions...</p>
+                  ) : userTransactions.length === 0 ? (
+                    <p className="text-center py-8 text-gray-500">No transactions found</p>
+                  ) : (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {userTransactions.map((tx) => (
+                        <div key={tx._id} className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-mono text-xs text-gray-500">{tx.reference}</p>
+                              <p className="font-bold text-gray-800">{tx.description}</p>
+                              <p className="text-xs text-gray-400">{new Date(tx.createdAt).toLocaleString()}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-lg font-black ${tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'}`}>
+                                {tx.type === 'deposit' ? '+' : '-'}${tx.amount.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-gray-500">Balance: ${tx.balanceAfter.toLocaleString()}</p>
+                            </div>
+                          </div>
+                          <div className="flex justify-end mt-2">
+                            <button
+                              onClick={() => {
+                                setSelectedTransaction(tx);
+                                setBackdateData({
+                                  newDate: tx.createdAt.split('T')[0],
+                                  newDescription: tx.description,
+                                  adminNote: ''
+                                });
+                                setShowBackdateModal(true);
+                              }}
+                              className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                              <FiEdit2 size={12} /> Backdate
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Forge Transaction Section */}
               <div className="bg-gray-900 p-8 rounded-3xl shadow-2xl text-white">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-3 bg-green-500/20 rounded-xl text-green-400"><FiPlus size={24}/></div>
@@ -550,6 +664,66 @@ export default function AdminDashboard() {
                   className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-2xl font-black transition-all shadow-lg shadow-green-900/20 disabled:opacity-50"
                 >
                   {isForging ? 'FORGING...' : 'FORGE TRANSACTION'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Backdate Modal */}
+      {showBackdateModal && selectedTransaction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#03305c]">Backdate Transaction</h3>
+              <button onClick={() => setShowBackdateModal(false)} className="text-gray-500 hover:text-gray-700">
+                <FiX size={24} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">New Date</label>
+                <input
+                  type="date"
+                  value={backdateData.newDate}
+                  onChange={(e) => setBackdateData({...backdateData, newDate: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">New Description (optional)</label>
+                <input
+                  type="text"
+                  value={backdateData.newDescription}
+                  onChange={(e) => setBackdateData({...backdateData, newDescription: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  placeholder="Leave empty to keep original"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Internal Note (not shown to user)</label>
+                <textarea
+                  value={backdateData.adminNote}
+                  onChange={(e) => setBackdateData({...backdateData, adminNote: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  rows={2}
+                  placeholder="Optional internal note"
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowBackdateModal(false)}
+                  className="flex-1 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBackdate}
+                  disabled={isBackdating}
+                  className="flex-1 bg-[#03305c] text-white py-2 rounded-lg font-bold hover:bg-[#e8742c] disabled:opacity-50"
+                >
+                  {isBackdating ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </div>
